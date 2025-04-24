@@ -1,0 +1,160 @@
+<!-- src/app/app.component.html -->
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto">
+    <!-- Stats Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-blue-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-gray-500">Total Tasks</p>
+            <p class="text-2xl font-semibold">{{tasks.length}}</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-green-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-gray-500">Completed</p>
+            <p class="text-2xl font-semibold">{{completedTasksCount}}</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center">
+          <div class="p-3 rounded-full bg-yellow-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-gray-500">Pending</p>
+            <p class="text-2xl font-semibold">{{pendingTasksCount}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Task Lists -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Pending Tasks -->
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-semibold text-gray-800">Pending Tasks</h2>
+          <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+            {{pendingTasksCount}} tasks
+          </span>
+        </div>
+        
+        <app-todo-add (todoAdd)="addTask($event)"></app-todo-add>
+
+        <div class="space-y-4 mt-6">
+          <div *ngFor="let task of pendingTasks" class="group">
+            <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition duration-200">
+              <ng-container *ngIf="edit && editTask._id === task._id; else taskView">
+                <div class="space-y-3">
+                  <input type="text" [(ngModel)]="editTask.name" 
+                         class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  <textarea [(ngModel)]="editTask.desc" rows="3"
+                           class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                  <div class="flex items-center space-x-2">
+                    <label class="text-sm text-gray-600">Deadline:</label>
+                    <input type="date" [(ngModel)]="editTask.deadline"
+                           class="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  </div>
+                  <div class="flex justify-end space-x-2">
+                    <button (click)="edit = false" class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                      Cancel
+                    </button>
+                    <button (click)="handleUpdate(task)" 
+                            class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200">
+                      Save Changes
+                    </button>
+                  </div>
+                </div>
+              </ng-container>
+
+              <ng-template #taskView>
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <h3 class="text-lg font-medium text-gray-800">{{task.name}}</h3>
+                    <p class="text-gray-600 mt-1">{{task.desc}}</p>
+                    <div class="flex items-center mt-2 text-sm text-gray-500">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      Due: {{task.deadline | date}}
+                    </div>
+                  </div>
+                  <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <button (click)="handleEdit(task)" class="p-2 text-blue-500 hover:text-blue-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
+                    <button (click)="handleComplete(task)" class="p-2 text-green-500 hover:text-green-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                    <button (click)="handleDelete(task)" class="p-2 text-red-500 hover:text-red-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Completed Tasks -->
+      <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-semibold text-gray-800">Completed Tasks</h2>
+          <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">
+            {{completedTasksCount}} tasks
+          </span>
+        </div>
+        
+        <div class="space-y-4">
+          <div *ngFor="let task of completedTasks" class="group">
+            <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition duration-200">
+              <div class="flex justify-between items-start">
+                <div class="flex-1">
+                  <h3 class="text-lg font-medium text-gray-800 line-through">{{task.name}}</h3>
+                  <p class="text-gray-600 mt-1 line-through">{{task.desc}}</p>
+                  <div class="flex items-center mt-2 text-sm text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Completed on: {{task.completedDate | date}}
+                  </div>
+                </div>
+                <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <button (click)="handleDelete(task)" class="p-2 text-red-500 hover:text-red-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

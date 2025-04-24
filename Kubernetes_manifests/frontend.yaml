@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: todo  # Specify the namespace if needed
+spec:
+  replicas: 1  # Adjust based on your desired replica count
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: snaveenkpn/todo-frontend:8 # Replace with your frontend image
+        ports:
+        - containerPort: 80  # Expose the frontend port
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: todo  # Specify the namespace if needed
+spec:
+  selector:
+    app: frontend
+  ports:
+  - protocol: TCP
+    port: 4200  # Port exposed for frontend access
+    targetPort: 80  # Port inside the container
+  type: ClusterIP  # Can be NodePort or ClusterIP or LoadBalancer depending on your needs

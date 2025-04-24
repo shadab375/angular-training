@@ -1,0 +1,51 @@
+<!-- src/app/MyComponents/todo-add/todo-add.component.html -->
+
+<form
+  (ngSubmit)="handleSubmit()"
+  class="max-w-md md:max-w-lg lg:max-w-xl
+   mx-auto m-3 p-2 rounded-md bg-blue-100 
+   flex flex-col justify-evenly"
+>
+  <input
+    type="text"
+    name="name"
+    placeholder="Enter your task name"
+    class="p-2 rounded-md font-semibold"
+    [(ngModel)]="name"
+    name="name"
+    (ngModelChange)="handleChange()"
+    autofocus
+  />
+
+  <textarea
+    rows="3"
+    cols="10"
+    name="desc"
+    placeholder="Enter your task description"
+    class="p-2 rounded-md font-semibold text-black my-2"
+    [(ngModel)]="desc"
+    name="desc"
+    (ngModelChange)="handleChange()"
+  >
+  </textarea>
+  <p class="font-semibold text-black mt-1">Deadline</p>
+
+  <input
+    type="date"
+    name="deadline"
+    class="p-2 rounded-md font-semibold text-black my-2"
+    [(ngModel)]="deadline"
+    name="deadline"
+    (ngModelChange)="handleChange()"
+    autofocus
+  />
+
+  <button
+    type="submit"
+    [disabled]="disable"
+    class="bg-blue-500 hover:bg-blue-600 p-2
+     rounded-md text-white font-semibold"
+  >
+    Add
+  </button>
+</form>
