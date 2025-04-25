@@ -3,6 +3,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TodoAddComponent } from './MyComponents/todo-add/todo-add.component';
 import { TodoService } from './service/todo.service';
+import { GeminiService } from './Services/gemini.service';
 import { CommonModule } from '@angular/common';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -54,7 +55,16 @@ export class AppComponent implements OnInit {
     today: Date = new Date();
     currentYear: number = new Date().getFullYear();
 
-    constructor(private todoService: TodoService) { }
+    // Gemini Chat Properties
+    userQuery: string = '';
+    aiResponse: string = '';
+    isLoading: boolean = false;
+    errorMessage: string = '';
+
+    constructor(
+        private todoService: TodoService,
+        private geminiService: GeminiService
+    ) { }
 
     ngOnInit(): void {
         this.getTasks();
@@ -213,5 +223,65 @@ export class AppComponent implements OnInit {
             case 'Low': return 'text-green-500';
             default: return 'text-gray-500';
         }
+    }
+
+    // Gemini Chat Method
+    submitQuery() {
+        if (!this.userQuery.trim()) return;
+
+        this.isLoading = true;
+        this.errorMessage = '';
+        this.aiResponse = ''; // Clear previous response
+
+        // Format task data for the prompt
+        const taskContext = this.tasks.map(task => ({
+            name: task.name,
+            description: task.desc,
+            deadline: task.deadline,
+            completed: task.completed,
+            priority: task.priority,
+            category: task.category,
+            tags: task.tags
+        }));
+
+        // Construct a detailed prompt for Gemini
+        const prompt = `You are a helpful task assistant. Here is the current task data from the user's database:
+
+${JSON.stringify(taskContext, null, 2)}
+
+User's question: ${this.userQuery}
+
+Please answer the question based on the task data provided above. If the question is about pending tasks, only consider tasks where completed is false. If it's about completed tasks, only consider tasks where completed is true. Be specific and use the actual task names, deadlines, and other details from the data.`;
+
+        this.geminiService.getGeminiResponse(prompt).subscribe({
+            next: (response) => {
+                try {
+                    // Extract the response text (adjust based on actual Gemini API response structure)
+                    const candidates = response?.candidates || [];
+                    if (candidates.length > 0 && candidates[0].content?.parts?.length > 0) {
+                        this.aiResponse = candidates[0].content.parts[0].text.trim();
+                    } else {
+                        console.error("Unexpected Gemini response structure:", response);
+                        this.aiResponse = 'No meaningful response received from AI.';
+                    }
+                } catch (error) {
+                    console.error("Error parsing AI response:", error);
+                    this.aiResponse = 'Error processing AI response.';
+                }
+                this.isLoading = false;
+            },
+            error: (error) => {
+                console.error('Failed to get AI response:', error);
+                // Provide more specific error if possible
+                this.errorMessage = `Failed to get AI response. Status: ${error.status || 'Unknown'}`;
+                if (error.status === 400) {
+                    this.errorMessage += ". Please check your API key and request format.";
+                } else if (error.status === 429) {
+                    this.errorMessage += ". API quota exceeded.";
+                }
+                this.isLoading = false;
+                this.aiResponse = ''; // Clear response on error
+            }
+        });
     }
 }
