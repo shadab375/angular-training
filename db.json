@@ -1,0 +1,78 @@
+{
+  "tasks": [
+    {
+      "id": "1",
+      "name": "Complete Angular Project",
+      "desc": "Finish the MEAN stack todo application with all features implemented",
+      "deadline": "2024-04-30",
+      "completed": false,
+      "priority": "High",
+      "category": "Work",
+      "tags": [
+        "angular",
+        "typescript",
+        "web"
+      ],
+      "createdAt": "2024-04-20T10:00:00Z",
+      "updatedAt": "2024-04-20T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "name": "Learn TypeScript",
+      "desc": "Study TypeScript fundamentals and advanced features",
+      "deadline": "2024-05-15",
+      "completed": true,
+      "completedDate": "2024-04-22T15:30:00Z",
+      "priority": "Medium",
+      "category": "Learning",
+      "tags": [
+        "typescript",
+        "programming"
+      ],
+      "createdAt": "2024-04-18T09:00:00Z",
+      "updatedAt": "2024-04-22T15:30:00Z"
+    },
+    {
+      "id": "3",
+      "name": "Setup MongoDB",
+      "desc": "Configure MongoDB database and implement data models",
+      "deadline": "2024-05-01",
+      "completed": false,
+      "priority": "High",
+      "category": "Work",
+      "tags": [
+        "mongodb",
+        "database"
+      ],
+      "createdAt": "2024-04-19T14:00:00Z",
+      "updatedAt": "2024-04-19T14:00:00Z"
+    },
+    {
+      "id": "4",
+      "name": "Review Project Documentation",
+      "desc": "Go through all project documentation and update if necessary",
+      "deadline": "2024-04-25",
+      "completed": false,
+      "priority": "Medium",
+      "category": "Documentation",
+      "tags": [
+        "documentation",
+        "review"
+      ],
+      "createdAt": "2024-04-21T11:00:00Z",
+      "updatedAt": "2024-04-21T11:00:00Z"
+    },
+    {
+      "id": "f52b",
+      "name": "Sample",
+      "desc": "Sample description",
+      "deadline": "Fri Apr 25 2025",
+      "priority": "High",
+      "completed": false,
+      "createdAt": "2025-04-25T05:50:43.922Z",
+      "updatedAt": "2025-04-25T05:50:43.922Z",
+      "tags": [],
+      "category": "General"
+    }
+  ]
+}

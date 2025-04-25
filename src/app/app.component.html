@@ -72,6 +72,15 @@
                     <input type="date" [(ngModel)]="editTask.deadline"
                            class="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                   </div>
+                  <div class="flex items-center space-x-2">
+                    <label class="text-sm text-gray-600">Priority:</label>
+                    <select [(ngModel)]="editTask.priority"
+                           class="px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                      <option value="Low">Low</option>
+                      <option value="Medium">Medium</option>
+                      <option value="High">High</option>
+                    </select>
+                  </div>
                   <div class="flex justify-end space-x-2">
                     <button (click)="edit = false" class="px-4 py-2 text-gray-600 hover:text-gray-800">
                       Cancel
@@ -94,6 +103,17 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                       Due: {{task.deadline | date}}
+                    </div>
+                    <div class="flex items-center mt-1">
+                      <span 
+                        [ngClass]="{
+                          'bg-red-100 text-red-600': task.priority === 'High',
+                          'bg-yellow-100 text-yellow-600': task.priority === 'Medium',
+                          'bg-green-100 text-green-600': task.priority === 'Low'
+                        }"
+                        class="px-2 py-1 rounded-full text-xs font-medium">
+                        Priority: {{task.priority}}
+                      </span>
                     </div>
                   </div>
                   <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -141,6 +161,17 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     Completed on: {{task.completedDate | date}}
+                  </div>
+                  <div class="flex items-center mt-1">
+                    <span 
+                      [ngClass]="{
+                        'bg-red-100 text-red-600': task.priority === 'High',
+                        'bg-yellow-100 text-yellow-600': task.priority === 'Medium',
+                        'bg-green-100 text-green-600': task.priority === 'Low'
+                      }"
+                      class="px-2 py-1 rounded-full text-xs font-medium line-through">
+                      Priority: {{task.priority}}
+                    </span>
                   </div>
                 </div>
                 <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">

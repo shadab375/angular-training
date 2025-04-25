@@ -2,7 +2,7 @@
 
 import { Component, OnInit } from '@angular/core';
 import { TodoAddComponent } from './MyComponents/todo-add/todo-add.component';
-import { MockTodoService } from './service/mock-todo.service';
+import { TodoService } from './service/todo.service';
 import { CommonModule } from '@angular/common';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -24,7 +24,7 @@ export class AppComponent implements OnInit {
     sortBy: string = 'deadline';
     sortDirection: 'asc' | 'desc' = 'asc';
 
-    constructor(private mockTodoService: MockTodoService) { }
+    constructor(private todoService: TodoService) { }
 
     ngOnInit(): void {
         this.getTasks();
@@ -47,7 +47,7 @@ export class AppComponent implements OnInit {
     }
 
     getTasks(): void {
-        this.mockTodoService.getTasks().subscribe(
+        this.todoService.getTasks().subscribe(
             (res: any) => {
                 this.tasks = res;
                 this.sortTasks();
@@ -59,7 +59,7 @@ export class AppComponent implements OnInit {
     }
 
     addTask(task: any): void {
-        this.mockTodoService.addTask(task).subscribe(
+        this.todoService.addTask(task).subscribe(
             (res: any) => {
                 console.log('Task added:', res);
                 this.getTasks();
@@ -72,7 +72,7 @@ export class AppComponent implements OnInit {
 
     handleDelete(task: any): void {
         if (confirm('Are you sure you want to delete this task?')) {
-            this.mockTodoService.deleteTask(task._id).subscribe(
+            this.todoService.deleteTask(task.id).subscribe(
                 (res: any) => {
                     console.log('Task Deleted:', res);
                     this.getTasks();
@@ -94,10 +94,11 @@ export class AppComponent implements OnInit {
     }
 
     handleComplete(task: any): void {
-        this.mockTodoService.updateTask(task._id, {
+        this.todoService.updateTask(task.id, {
             name: task.name,
             desc: task.desc,
             deadline: task.deadline,
+            priority: task.priority,
             completed: true,
             completedDate: new Date().toISOString()
         }).subscribe(
@@ -115,12 +116,13 @@ export class AppComponent implements OnInit {
         this.edit = false;
         // Ensure deadline is in the correct format
         const updatedTask = {
-            name: task.name,
-            desc: task.desc,
+            name: this.editTask.name,
+            desc: this.editTask.desc,
             deadline: new Date(this.editTask.deadline).toISOString(),
+            priority: this.editTask.priority
         };
         
-        this.mockTodoService.updateTask(task._id, updatedTask).subscribe(
+        this.todoService.updateTask(task.id, updatedTask).subscribe(
             (res: any) => {
                 console.log('Task Updated:', res);
                 this.getTasks();

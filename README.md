@@ -1,27 +1,54 @@
-# Frontend
+# TaskMaster Pro Todo App
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.11.
+This is an Angular-based Todo application that uses JSON Server as a backend.
 
-## Development server
+## Setup and Installation
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+1. Install dependencies:
+```
+npm install
+```
 
-## Code scaffolding
+2. JSON Server has already been installed globally:
+```
+npm install -g json-server
+```
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Running the Application
 
-## Build
+1. Start JSON Server (in one terminal):
+```
+json-server --watch db.json
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+This will start the API server at http://localhost:3000/tasks
 
-## Running unit tests
+2. Start the Angular application (in another terminal):
+```
+ng serve
+```
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+This will start the Angular app at http://localhost:4200
 
-## Running end-to-end tests
+## Features
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+- Add, edit, and delete tasks
+- Mark tasks as completed
+- Set deadlines for tasks
+- Filter and sort tasks
+- Search tasks by name or description
 
-## Further help
+## API Endpoints
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- GET /tasks - Get all tasks
+- POST /tasks - Create a new task
+- PUT /tasks/:id - Update a task
+- DELETE /tasks/:id - Delete a task
+
+## Initial Data
+
+The db.json file contains some initial tasks to get you started.
+
+## Note
+
+This application uses JSON Server as a fake REST API backend. In a production environment, you would replace it with a real backend server.

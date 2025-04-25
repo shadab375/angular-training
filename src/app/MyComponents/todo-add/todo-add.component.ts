@@ -27,6 +27,7 @@ class TodoAddComponent implements OnInit {
     name: string = 'Sample';
     desc: string = "Sample description";
     deadline: string = new Date().toDateString();
+    priority: string = "Medium";
     disable: boolean = true;
     @Output() todoAdd: EventEmitter<any> = new EventEmitter();
 
@@ -45,11 +46,13 @@ class TodoAddComponent implements OnInit {
         this.todoAdd.emit({
             name: this.name,
             desc: this.desc,
-            deadline: this.deadline
+            deadline: this.deadline,
+            priority: this.priority
         } as any)
         this.name = "";
         this.desc = "";
         this.deadline = new Date().toDateString();
+        this.priority = "Medium";
         this.handleChange();
     }
 
