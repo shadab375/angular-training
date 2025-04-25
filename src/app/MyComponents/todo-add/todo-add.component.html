@@ -2,62 +2,74 @@
 
 <form
   (ngSubmit)="handleSubmit()"
-  class="max-w-md md:max-w-lg lg:max-w-xl
-   mx-auto m-3 p-2 rounded-md bg-blue-100 
-   flex flex-col justify-evenly"
+  class="max-w-md md:max-w-lg lg:max-w-xl mx-auto m-3 p-6 rounded-lg bg-white shadow-lg transition-all duration-300 hover:shadow-xl"
+  [@formAnimation]="true"
 >
-  <input
-    type="text"
-    name="name"
-    placeholder="Enter your task name"
-    class="p-2 rounded-md font-semibold"
-    [(ngModel)]="name"
-    name="name"
-    (ngModelChange)="handleChange()"
-    autofocus
-  />
+  <h3 class="text-xl font-semibold text-gray-800 mb-4">Add New Task</h3>
 
-  <textarea
-    rows="3"
-    cols="10"
-    name="desc"
-    placeholder="Enter your task description"
-    class="p-2 rounded-md font-semibold text-black my-2"
-    [(ngModel)]="desc"
-    name="desc"
-    (ngModelChange)="handleChange()"
-  >
-  </textarea>
-  <p class="font-semibold text-black mt-1">Deadline</p>
+  <div class="mb-4 transition-all duration-300 hover:transform hover:scale-[1.01]">
+    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Task Name</label>
+    <input
+      type="text"
+      id="name"
+      name="name"
+      placeholder="What needs to be done?"
+      class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+      [(ngModel)]="name"
+      (ngModelChange)="handleChange()"
+      autofocus
+    />
+  </div>
 
-  <input
-    type="date"
-    name="deadline"
-    class="p-2 rounded-md font-semibold text-black my-2"
-    [(ngModel)]="deadline"
-    name="deadline"
-    (ngModelChange)="handleChange()"
-    autofocus
-  />
+  <div class="mb-4 transition-all duration-300 hover:transform hover:scale-[1.01]">
+    <label for="desc" class="block text-sm font-medium text-gray-700 mb-1">Task Description</label>
+    <textarea
+      id="desc"
+      rows="3"
+      name="desc"
+      placeholder="Add more details about your task..."
+      class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+      [(ngModel)]="desc"
+      (ngModelChange)="handleChange()"
+    ></textarea>
+  </div>
 
-  <p class="font-semibold text-black mt-1">Priority</p>
-  <select
-    name="priority"
-    class="p-2 rounded-md font-semibold text-black my-2"
-    [(ngModel)]="priority"
-    name="priority"
-  >
-    <option value="Low">Low</option>
-    <option value="Medium">Medium</option>
-    <option value="High">High</option>
-  </select>
+  <div class="mb-4 transition-all duration-300 hover:transform hover:scale-[1.01]">
+    <label for="deadline" class="block text-sm font-medium text-gray-700 mb-1">Deadline</label>
+    <input
+      type="date"
+      id="deadline"
+      name="deadline"
+      class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+      [(ngModel)]="deadline"
+      (ngModelChange)="handleChange()"
+    />
+  </div>
+
+  <div class="mb-5 transition-all duration-300 hover:transform hover:scale-[1.01]">
+    <label for="priority" class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+    <select
+      id="priority"
+      name="priority"
+      class="w-full p-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all duration-200"
+      [(ngModel)]="priority"
+    >
+      <option value="Low">Low</option>
+      <option value="Medium">Medium</option>
+      <option value="High">High</option>
+    </select>
+  </div>
 
   <button
     type="submit"
     [disabled]="disable"
-    class="bg-blue-500 hover:bg-blue-600 p-2
-     rounded-md text-white font-semibold"
+    class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium py-3 px-4 rounded-lg transition-all duration-300 hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
   >
-    Add
+    <div class="flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+      Add Task
+    </div>
   </button>
 </form>

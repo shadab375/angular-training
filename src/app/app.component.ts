@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
+import { trigger, state, style, animate, transition, query, stagger } from '@angular/animations';
 
 @Component({
     selector: 'app-root',
@@ -14,6 +15,33 @@ import { DatePipe } from '@angular/common';
     imports: [TodoAddComponent, CommonModule, NgIf, FormsModule, DatePipe],
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
+    animations: [
+        trigger('fadeAnimation', [
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('600ms ease-out', style({ opacity: 1 }))
+            ])
+        ]),
+        trigger('fadeInAnimation', [
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('400ms ease-out', style({ opacity: 1 }))
+            ])
+        ]),
+        trigger('countAnimation', [
+            transition('* => *', [
+                style({ scale: 1 }),
+                animate('300ms ease-out', style({ scale: 1.1 })),
+                animate('200ms ease-in', style({ scale: 1 }))
+            ])
+        ]),
+        trigger('taskAnimation', [
+            transition('void => in', [
+                style({ transform: 'translateY(20px)', opacity: 0 }),
+                animate('{{delay}}ms ease-out', style({ transform: 'translateY(0)', opacity: 1 }))
+            ])
+        ])
+    ]
 })
 export class AppComponent implements OnInit {
     title = 'TaskMaster Pro';
@@ -23,6 +51,8 @@ export class AppComponent implements OnInit {
     searchQuery: string = '';
     sortBy: string = 'deadline';
     sortDirection: 'asc' | 'desc' = 'asc';
+    today: Date = new Date();
+    currentYear: number = new Date().getFullYear();
 
     constructor(private todoService: TodoService) { }
 

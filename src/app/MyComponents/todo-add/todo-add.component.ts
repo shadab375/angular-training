@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { WebrequestService } from '../../service/webrequest.service';
 import { NgIf } from '@angular/common';
+import { trigger, state, style, animate, transition } from '@angular/animations';
 
 
 export @Component({
@@ -12,7 +13,19 @@ export @Component({
     standalone: true,
     imports: [FormsModule, NgIf],
     templateUrl: './todo-add.component.html',
-    styleUrls: ['./todo-add.component.css']
+    styleUrls: ['./todo-add.component.css'],
+    animations: [
+        trigger('formAnimation', [
+            transition(':enter', [
+                style({ transform: 'translateY(20px)', opacity: 0 }),
+                animate('400ms ease-out', style({ transform: 'translateY(0)', opacity: 1 }))
+            ]),
+            transition(':leave', [
+                style({ transform: 'translateY(0)', opacity: 1 }),
+                animate('300ms ease-in', style({ transform: 'translateY(20px)', opacity: 0 }))
+            ])
+        ])
+    ]
 })
 
 class TodoAddComponent implements OnInit {
