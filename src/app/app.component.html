@@ -2,14 +2,14 @@
 <div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 transition-all duration-500" [@fadeAnimation]="true">
   <!-- Header -->
   <header class="max-w-7xl mx-auto mb-8">
-    <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 flex items-center justify-between border border-slate-700">
+    <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 flex items-center justify-between border border-slate-700 glow-effect">
       <div class="flex items-center">
         <div class="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
         </div>
-        <h1 class="ml-4 text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">Task Master Pro</h1>
+        <h1 class="ml-4 text-2xl font-bold gradient-text">Task Master Pro</h1>
       </div>
       <div class="text-sm font-medium text-slate-300">
         <span>{{today | date:'fullDate'}}</span>
@@ -21,7 +21,7 @@
   <main class="max-w-7xl mx-auto">
     <!-- Stats Overview -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl transform hover:scale-[1.02] border border-slate-700" [@countAnimation]="tasks.length">
+      <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl transform hover:scale-[1.02] border border-slate-700 glow-effect" [@countAnimation]="tasks.length">
         <div class="flex items-center">
           <div class="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -30,11 +30,11 @@
           </div>
           <div class="ml-4">
             <p class="text-slate-400 font-medium">Total Tasks</p>
-            <p class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">{{tasks.length}}</p>
+            <p class="text-2xl font-bold gradient-text">{{tasks.length}}</p>
           </div>
         </div>
       </div>
-      <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl transform hover:scale-[1.02] border border-slate-700" [@countAnimation]="completedTasksCount">
+      <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl transform hover:scale-[1.02] border border-slate-700 glow-effect" [@countAnimation]="completedTasksCount">
         <div class="flex items-center">
           <div class="p-3 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -43,11 +43,11 @@
           </div>
           <div class="ml-4">
             <p class="text-slate-400 font-medium">Completed</p>
-            <p class="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">{{completedTasksCount}}</p>
+            <p class="text-2xl font-bold gradient-text">{{completedTasksCount}}</p>
           </div>
         </div>
       </div>
-      <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl transform hover:scale-[1.02] border border-slate-700" [@countAnimation]="pendingTasksCount">
+      <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl transform hover:scale-[1.02] border border-slate-700 glow-effect" [@countAnimation]="pendingTasksCount">
         <div class="flex items-center">
           <div class="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -56,14 +56,14 @@
           </div>
           <div class="ml-4">
             <p class="text-slate-400 font-medium">Pending</p>
-            <p class="text-2xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">{{pendingTasksCount}}</p>
+            <p class="text-2xl font-bold gradient-text">{{pendingTasksCount}}</p>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Gemini Chat Section -->
-    <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-8 transition-all duration-300 hover:shadow-xl border border-slate-700">
+    <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-8 transition-all duration-300 hover:shadow-xl border border-slate-700 glow-effect">
       <h2 class="text-xl font-bold text-slate-200 mb-4 flex items-center">
         <div class="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg mr-3">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -109,7 +109,7 @@
     <!-- Task Lists -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <!-- Pending Tasks -->
-      <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border border-slate-700">
+      <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border border-slate-700 glow-effect">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-xl font-bold text-slate-200 flex items-center">
             <div class="p-2 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg mr-3">
@@ -127,7 +127,7 @@
         <app-todo-add (todoAdd)="addTask($event)" [@fadeInAnimation]></app-todo-add>
 
         <div class="space-y-4 mt-6">
-          <div *ngFor="let task of pendingTasks; let i = index" class="group" [@taskAnimation]="{value: 'in', params: {delay: i * 100}}">
+          <div *ngFor="let task of pendingTasks; let i = index" class="group task-card" [@taskAnimation]="{value: 'in', params: {delay: i * 100}}">
             <div class="bg-slate-900/50 rounded-xl p-4 hover:bg-slate-800 transition-all duration-300 transform hover:scale-[1.01] hover:shadow-md border border-slate-700">
               <ng-container *ngIf="edit && editTask._id === task._id; else taskView">
                 <div class="space-y-3">
@@ -175,9 +175,9 @@
                     <div class="flex items-center mt-1">
                       <span 
                         [ngClass]="{
-                          'bg-red-900/50 text-red-300': task.priority === 'High',
-                          'bg-amber-900/50 text-amber-300': task.priority === 'Medium',
-                          'bg-emerald-900/50 text-emerald-300': task.priority === 'Low'
+                          'priority-high': task.priority === 'High',
+                          'priority-medium': task.priority === 'Medium',
+                          'priority-low': task.priority === 'Low'
                         }"
                         class="px-2 py-1 rounded-full text-xs font-medium">
                         Priority: {{task.priority}}
@@ -218,7 +218,7 @@
       </div>
 
       <!-- Completed Tasks -->
-      <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border border-slate-700">
+      <div class="bg-slate-800/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border border-slate-700 glow-effect">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-xl font-bold text-slate-200 flex items-center">
             <div class="p-2 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg mr-3">
@@ -234,7 +234,7 @@
         </div>
         
         <div class="space-y-4">
-          <div *ngFor="let task of completedTasks; let i = index" class="group" [@taskAnimation]="{value: 'in', params: {delay: i * 100}}">
+          <div *ngFor="let task of completedTasks; let i = index" class="group task-card" [@taskAnimation]="{value: 'in', params: {delay: i * 100}}">
             <div class="bg-slate-900/50 rounded-xl p-4 hover:bg-slate-800 transition-all duration-300 transform hover:scale-[1.01] hover:shadow-md border border-slate-700">
               <div class="flex justify-between items-start">
                 <div class="flex-1">
@@ -245,17 +245,6 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     Completed on: {{task.completedDate | date}}
-                  </div>
-                  <div class="flex items-center mt-1">
-                    <span 
-                      [ngClass]="{
-                        'bg-red-900/30 text-red-500': task.priority === 'High',
-                        'bg-amber-900/30 text-amber-500': task.priority === 'Medium',
-                        'bg-emerald-900/30 text-emerald-500': task.priority === 'Low'
-                      }"
-                      class="px-2 py-1 rounded-full text-xs font-medium line-through">
-                      Priority: {{task.priority}}
-                    </span>
                   </div>
                 </div>
                 <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
@@ -275,7 +264,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p class="text-slate-400">No completed tasks</p>
-            <p class="text-sm text-slate-500 mt-1">Complete a task to see it here</p>
+            <p class="text-sm text-slate-500 mt-1">Complete some tasks to see them here</p>
           </div>
         </div>
       </div>

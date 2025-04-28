@@ -3,7 +3,6 @@
 import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { WebrequestService } from '../../service/webrequest.service';
 import { NgIf } from '@angular/common';
 import { trigger, state, style, animate, transition } from '@angular/animations';
 
@@ -30,8 +29,7 @@ export @Component({
 
 class TodoAddComponent implements OnInit {
     task: any;
-    constructor(private webrequest: WebrequestService) {
-    }
+
 
     ngOnInit(): void {
         this.handleChange();
