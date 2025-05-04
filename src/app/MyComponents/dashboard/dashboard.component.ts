@@ -60,6 +60,8 @@ export class DashboardComponent implements OnInit {
   userQuery: string = '';
   aiResponse: string = '';
   isLoading: boolean = false;
+  operationInProgress: boolean = false;
+  operationResult: { success: boolean, message: string } | null = null;
 
   constructor(
     private router: Router,
@@ -267,18 +269,81 @@ export class DashboardComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
     this.aiResponse = ''; // Clear previous response
+    this.operationResult = null;
 
     // Format task data for the prompt
     const taskContext = this.tasks.map(task => ({
+      id: task.id,
       name: task.name,
       description: task.desc,
       deadline: task.deadline,
       completed: task.completed,
       priority: task.priority,
-      category: task.category,
-      tags: task.tags
+      category: task.category || 'General',
+      tags: task.tags || []
     }));
 
+    // First, check if this is a CRUD operation
+    this.geminiService.processTaskOperation(this.userQuery, taskContext).subscribe({
+      next: (result) => {
+        if (result.operation !== 'query' && result.operation !== 'error') {
+          // This is a CRUD operation
+          this.operationInProgress = true;
+          this.geminiService.executeTaskOperation(result.operation, result.data, this.tasks).subscribe({
+            next: (opResult) => {
+              this.operationResult = opResult;
+              if (opResult.success) {
+                // If the operation was successful, refresh the task list
+                if (!opResult.isQuery) {
+                  this.getTasks();
+                  this.userQuery = ''; // Clear input field after successful operation
+                }
+              }
+              
+              if (!opResult.isQuery) {
+                this.aiResponse = opResult.message;
+              } else {
+                // It's a regular query, proceed with normal handling
+                this.handleRegularQuery(taskContext);
+              }
+              
+              this.isLoading = false;
+              this.operationInProgress = false;
+            },
+            error: (error) => {
+              console.error('Error executing operation:', error);
+              this.operationResult = { success: false, message: 'Failed to execute the requested operation.' };
+              this.errorMessage = 'Could not perform the requested task operation.';
+              this.isLoading = false;
+              this.operationInProgress = false;
+            }
+          });
+        } else if (result.operation === 'error') {
+          // Error parsing AI response
+          this.aiResponse = result.rawResponse;
+          this.isLoading = false;
+        } else {
+          // This is a regular query
+          if (result.rawResponse) {
+            // We already have a direct response
+            this.aiResponse = result.rawResponse;
+            this.isLoading = false;
+          } else {
+            // Process as a regular query
+            this.handleRegularQuery(taskContext);
+          }
+        }
+      },
+      error: (error) => {
+        console.error('Failed to process operation:', error);
+        this.errorMessage = 'Failed to process your request.';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  // Handle regular queries that are not CRUD operations
+  private handleRegularQuery(taskContext: any[]) {
     // Construct a detailed prompt for Gemini
     const prompt = `You are a helpful task assistant. Here is the current task data from the user's database:
 
@@ -286,12 +351,18 @@ ${JSON.stringify(taskContext, null, 2)}
 
 User's question: ${this.userQuery}
 
-Please answer the question based on the task data provided above. If the question is about pending tasks, only consider tasks where completed is false. If it's about completed tasks, only consider tasks where completed is true. Be specific and use the actual task names, deadlines, and other details from the data.`;
+Please answer the question based on the task data provided above. If the question is about pending tasks, only consider tasks where completed is false. If it's about completed tasks, only consider tasks where completed is true. Be specific and use the actual task names, deadlines, and other details from the data.
+
+Additionally, let the user know they can ask you to:
+- Create new tasks ("Create a task to...")
+- Update existing tasks ("Update the task...")
+- Mark tasks as complete ("Mark task X as complete")
+- Delete tasks ("Delete task Y")`;
 
     this.geminiService.getGeminiResponse(prompt).subscribe({
       next: (response) => {
         try {
-          // Extract the response text (adjust based on actual Gemini API response structure)
+          // Extract the response text
           const candidates = response?.candidates || [];
           if (candidates.length > 0 && candidates[0].content?.parts?.length > 0) {
             this.aiResponse = candidates[0].content.parts[0].text.trim();

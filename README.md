@@ -55,5 +55,4 @@ This application uses JSON Server as a fake REST API backend. In a production en
 
 
 1. Add routing in this app, pass arguments from one page to another
-2. External views / internal views - load that in the page and use in my app
-3. Add user authentication
+2. Add user authentication

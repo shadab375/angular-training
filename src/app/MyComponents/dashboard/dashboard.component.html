@@ -90,37 +90,80 @@
         </div>
         Ask Gemini AI about your tasks
       </h2>
+      
+      <!-- Tips for using Gemini -->
+      <div class="mb-4 p-3 bg-slate-700/30 rounded-xl text-sm text-slate-300">
+        <p><span class="font-medium text-blue-400">Pro tip:</span> Besides asking questions, you can also:</p>
+        <ul class="list-disc list-inside mt-1 ml-2 text-slate-400 space-y-1">
+          <li>Create tasks: <span class="text-slate-300 italic">"Create a task to prepare presentation for tomorrow"</span></li>
+          <li>Update tasks: <span class="text-slate-300 italic">"Update the Deploy App task deadline to next Friday"</span></li>
+          <li>Complete tasks: <span class="text-slate-300 italic">"Mark the Review Code task as complete"</span></li>
+          <li>Delete tasks: <span class="text-slate-300 italic">"Delete the old meeting notes task"</span></li>
+        </ul>
+      </div>
+      
       <div class="input-group mb-4 flex space-x-2">
         <input
           type="text"
           [(ngModel)]="userQuery"
           (keyup.enter)="submitQuery()" 
-          class="flex-grow px-4 py-3 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-          placeholder="e.g., Which tasks are pending? Is 'Deploy App' complete?"
+          [disabled]="isLoading || operationInProgress"
+          class="flex-grow px-4 py-3 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          placeholder="e.g., Create a task to call John tomorrow, or ask about pending tasks..."
         />
         <button 
           (click)="submitQuery()" 
-          [disabled]="isLoading || !userQuery.trim()"
+          [disabled]="isLoading || operationInProgress || !userQuery.trim()"
           class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium rounded-xl hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02] disabled:transform-none shadow-lg">
-          {{ isLoading ? 'Asking...' : 'Ask AI' }}
+          <span *ngIf="!isLoading && !operationInProgress">Ask AI</span>
+          <span *ngIf="isLoading && !operationInProgress">Thinking...</span>
+          <span *ngIf="operationInProgress">Processing...</span>
         </button>
       </div>
 
-      <div *ngIf="isLoading" class="loader text-center text-slate-400 py-4">
+      <!-- Loading indicator -->
+      <div *ngIf="isLoading || operationInProgress" class="loader text-center text-slate-400 py-4">
         <svg class="animate-spin h-6 w-6 text-blue-400 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        Thinking...
+        <span *ngIf="isLoading && !operationInProgress">Analyzing your request...</span>
+        <span *ngIf="operationInProgress">Performing task operation...</span>
       </div>
 
+      <!-- Error message -->
       <div *ngIf="errorMessage" class="error-message mt-4 p-4 bg-red-900/50 text-red-300 border border-red-800 rounded-xl">
         <strong>Error:</strong> {{ errorMessage }}
       </div>
 
-      <div *ngIf="aiResponse && !isLoading && !errorMessage" class="ai-response mt-4 p-4 bg-slate-900/50 border border-slate-700 rounded-xl">
-        <h4 class="font-semibold text-slate-200 mb-2">AI Response:</h4>
-        <p class="text-slate-300 whitespace-pre-wrap">{{ aiResponse }}</p> 
+      <!-- Operation result message (successful operations) -->
+      <div *ngIf="operationResult && operationResult.success" class="mt-4 p-4 bg-emerald-900/30 text-emerald-300 border border-emerald-800/50 rounded-xl flex items-start">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 mt-0.5 flex-shrink-0 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <p>{{ operationResult.message }}</p>
+      </div>
+
+      <!-- Operation result message (failed operations) -->
+      <div *ngIf="operationResult && !operationResult.success" class="mt-4 p-4 bg-amber-900/30 text-amber-300 border border-amber-800/50 rounded-xl flex items-start">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 mt-0.5 flex-shrink-0 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+        <p>{{ operationResult.message }}</p>
+      </div>
+
+      <!-- AI response -->
+      <div *ngIf="aiResponse && !isLoading && !operationInProgress && !errorMessage" class="ai-response mt-4 p-4 bg-slate-900/50 border border-slate-700 rounded-xl">
+        <div class="flex items-start">
+          <div class="p-2 mr-3 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 shadow-md flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714a2.25 2.25 0 01-.659 1.591L9.5 14.5m3.25-11.396c.251.023.501.05.75.082m-1.5-.082a24.301 24.301 0 00-4.5 0m12 0v5.714a2.25 2.25 0 01-.659 1.591L18.5 14.5m-6-8.396a24.301 24.301 0 00-4.5 0m0 0c-1.158.104-2.301.274-3.426.51C2.331 8.457 0 10.6 0 13.5v.5C0 17.799 3.716 21 8 21h8c4.284 0 8-3.201 8-7v-.5c0-2.9-2.331-5.043-4.574-5.886-1.125-.236-2.268-.406-3.426-.51" />
+            </svg>
+          </div>
+          <div class="flex-1">
+            <p class="text-slate-300 whitespace-pre-wrap">{{ aiResponse }}</p>
+          </div>
+        </div>
       </div>
     </div>
 
