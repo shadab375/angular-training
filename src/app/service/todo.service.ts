@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, switchMap } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, switchMap, map, of, throwError } from 'rxjs';
+import { AuthService } from '../Services/auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,15 +9,38 @@ import { Observable, switchMap } from 'rxjs';
 export class TodoService {
   private apiUrl = 'http://localhost:3000/tasks';
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
+
+  private getHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+  }
 
   getTasks(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+    const userId = this.authService.currentUserValue?.id;
+    if (!userId) {
+      return throwError(() => new Error('User not authenticated'));
+    }
+    return this.http.get<any[]>(this.apiUrl, { headers: this.getHeaders() }).pipe(
+      map(tasks => tasks.filter(task => task.userId === userId))
+    );
   }
 
   addTask(task: any): Observable<any> {
+    const userId = this.authService.currentUserValue?.id;
+    if (!userId) {
+      return throwError(() => new Error('User not authenticated'));
+    }
+    
     const newTask = {
       ...task,
+      userId,
       completed: false,
       priority: this.calculatePriority(task.deadline),
       createdAt: new Date().toISOString(),
@@ -24,27 +48,53 @@ export class TodoService {
       tags: task.tags || [],
       category: task.category || 'General'
     };
-    return this.http.post<any>(this.apiUrl, newTask);
+    return this.http.post<any>(this.apiUrl, newTask, { headers: this.getHeaders() });
   }
 
   updateTask(id: string, task: any): Observable<any> {
-    // Get the current task to preserve fields not included in the update
-    return this.http.get<any>(`${this.apiUrl}/${id}`).pipe(
+    const userId = this.authService.currentUserValue?.id;
+    if (!userId) {
+      return throwError(() => new Error('User not authenticated'));
+    }
+
+    return this.http.get<any>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() }).pipe(
       switchMap(existingTask => {
+        if (!existingTask) {
+          return throwError(() => new Error('Task not found'));
+        }
+        if (existingTask.userId !== userId) {
+          return throwError(() => new Error('Unauthorized to update this task'));
+        }
+
         const updatedTask = {
           ...existingTask,
           ...task,
+          userId, // Ensure userId remains unchanged
           updatedAt: new Date().toISOString(),
           priority: task.deadline ? this.calculatePriority(task.deadline) : existingTask.priority
         };
-        // Update the task on the server
-        return this.http.put<any>(`${this.apiUrl}/${id}`, updatedTask);
+        return this.http.put<any>(`${this.apiUrl}/${id}`, updatedTask, { headers: this.getHeaders() });
       })
     );
   }
 
   deleteTask(id: string): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+    const userId = this.authService.currentUserValue?.id;
+    if (!userId) {
+      return throwError(() => new Error('User not authenticated'));
+    }
+
+    return this.http.get<any>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() }).pipe(
+      switchMap(task => {
+        if (!task) {
+          return throwError(() => new Error('Task not found'));
+        }
+        if (task.userId !== userId) {
+          return throwError(() => new Error('Unauthorized to delete this task'));
+        }
+        return this.http.delete<any>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+      })
+    );
   }
 
   private calculatePriority(deadline: string): string {

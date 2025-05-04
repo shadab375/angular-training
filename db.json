@@ -86,5 +86,25 @@
       "tags": [],
       "category": "General"
     }
+  ],
+  "users": [
+    {
+      "id": "1",
+      "name": "Admin User",
+      "email": "admin@example.com",
+      "password": "$2a$10$X7Q8Y9Z0A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6"
+    },
+    {
+      "id": "1746338892580",
+      "name": "Shadab",
+      "email": "shadabkalim675@gmail.com",
+      "password": "$2a$10$9nRI0pjsdxdVeSxQ8Ku.2OtYG77jp4VVLAhRrzbC9AXHdZ2kbdJKa"
+    },
+    {
+      "id": "1746338967533",
+      "name": "John Doe",
+      "email": "johndoe@gmail.com",
+      "password": "$2a$10$e6un5vIUwRXzWrJTgIbqV.J.0L1hzkTpQywiXU9C3UzIZ8ybtQMPC"
+    }
   ]
 }
