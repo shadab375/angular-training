@@ -42,7 +42,7 @@ export class TodoService {
       ...task,
       userId,
       completed: false,
-      priority: this.calculatePriority(task.deadline),
+      priority: task.priority || 'Medium',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       tags: task.tags || [],
@@ -69,9 +69,9 @@ export class TodoService {
         const updatedTask = {
           ...existingTask,
           ...task,
-          userId, // Ensure userId remains unchanged
+          userId,
           updatedAt: new Date().toISOString(),
-          priority: task.deadline ? this.calculatePriority(task.deadline) : existingTask.priority
+          priority: task.priority || existingTask.priority
         };
         return this.http.put<any>(`${this.apiUrl}/${id}`, updatedTask, { headers: this.getHeaders() });
       })
