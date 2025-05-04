@@ -7,7 +7,7 @@ import { TodoService } from '../../service/todo.service';
 import { GeminiService } from '../../Services/gemini.service';
 import { AuthService } from '../../Services/auth.service';
 import { DatePipe } from '@angular/common';
-import { trigger, state, style, animate, transition } from '@angular/animations';
+import { trigger, state, style, animate, transition, query } from '@angular/animations';
 
 @Component({
   selector: 'app-dashboard',
@@ -18,26 +18,30 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
     trigger('fadeAnimation', [
       transition(':enter', [
         style({ opacity: 0 }),
-        animate('600ms ease-out', style({ opacity: 1 }))
+        animate('500ms ease-out', style({ opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('500ms ease-in', style({ opacity: 0 }))
       ])
     ]),
     trigger('fadeInAnimation', [
       transition(':enter', [
-        style({ opacity: 0 }),
-        animate('400ms ease-out', style({ opacity: 1 }))
-      ])
-    ]),
-    trigger('countAnimation', [
-      transition('* => *', [
-        style({ scale: 1 }),
-        animate('300ms ease-out', style({ scale: 1.1 })),
-        animate('200ms ease-in', style({ scale: 1 }))
+        style({ opacity: 0, transform: 'translateY(20px)' }),
+        animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
       ])
     ]),
     trigger('taskAnimation', [
       transition('void => in', [
-        style({ transform: 'translateY(20px)', opacity: 0 }),
-        animate('{{delay}}ms ease-out', style({ transform: 'translateY(0)', opacity: 1 }))
+        style({ opacity: 0, transform: 'translateY(20px)' }),
+        animate('{{delay}}ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ]),
+    trigger('countAnimation', [
+      transition('* => *', [
+        query(':self', [
+          style({ color: 'rgba(129, 140, 248, 1)', textShadow: '0 0 15px rgba(129, 140, 248, 0.8)' }),
+          animate('800ms ease-out', style({ color: 'white', textShadow: '0 0 10px rgba(129, 140, 248, 0.5)' }))
+        ], { optional: true })
       ])
     ])
   ]

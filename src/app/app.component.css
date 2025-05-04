@@ -130,10 +130,12 @@ input:focus, textarea:focus, select:focus {
   background: linear-gradient(90deg, #3b82f6, #6366f1, #8b5cf6);
   background-size: 200% auto;
   color: transparent;
+  -webkit-text-fill-color: transparent;
   background-clip: text;
   -webkit-background-clip: text;
   animation: gradient 3s linear infinite;
   will-change: background-position; /* Optimize animation performance */
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.1); /* Subtle text shadow for better visibility */
 }
 
 @keyframes gradient {
@@ -143,6 +145,13 @@ input:focus, textarea:focus, select:focus {
   100% {
     background-position: 200% center;
   }
+}
+
+/* Ensure task counts are clearly visible */
+.stats-count {
+  color: white;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Fix for click events on interactive elements */
@@ -162,4 +171,17 @@ button, input, select, textarea {
   button, input, select, textarea {
     min-height: 44px; /* Apple's recommended minimum touch target size */
   }
+}
+
+/* Ensure all text has sufficient contrast on dark backgrounds */
+.text-white {
+  color: #ffffff !important;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Add high visibility class for important UI elements */
+.high-visibility-text {
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
+  font-weight: bold;
 }

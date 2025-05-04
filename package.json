@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:frontend": "node dist/frontend/server/server.mjs",
-    "server": "json-server --watch db.json",
+    "server": "node json-server.config.js",
     "dev": "concurrently \"npm run server\" \"npm run start\""
   },
   "private": true,

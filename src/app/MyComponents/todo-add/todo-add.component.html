@@ -2,19 +2,26 @@
 
 <form
   (ngSubmit)="handleSubmit()"
-  class="max-w-md md:max-w-lg lg:max-w-xl mx-auto m-3 p-6 rounded-2xl bg-slate-800/80 backdrop-blur-sm shadow-lg transition-all duration-300 hover:shadow-xl border border-slate-700"
+  class="max-w-md md:max-w-lg lg:max-w-xl mx-auto m-3 p-6 rounded-2xl bg-black/60 backdrop-blur-xl shadow-[0_0_20px_rgba(59,130,246,0.2)] transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] border border-blue-900/50 transform hover:scale-[1.01]"
   [@formAnimation]="true"
 >
-  <h3 class="text-xl font-semibold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent mb-4">Add New Task</h3>
+  <h3 class="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 mb-4 flex items-center">
+    <div class="p-2 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 shadow-[0_0_15px_rgba(59,130,246,0.4)] mr-3">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+    </div>
+    Add New Task
+  </h3>
 
   <div class="mb-4 transition-all duration-300 hover:transform hover:scale-[1.01]">
-    <label for="name" class="block text-sm font-medium text-slate-300 mb-1">Task Name</label>
+    <label for="name" class="block text-sm font-medium text-blue-400 mb-1">Task Name</label>
     <input
       type="text"
       id="name"
       name="name"
       placeholder="What needs to be done?"
-      class="w-full p-3 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+      class="w-full p-3 rounded-xl border border-blue-900/50 bg-black/80 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 placeholder-blue-900/50"
       [(ngModel)]="name"
       (ngModelChange)="handleChange()"
       autofocus
@@ -22,36 +29,36 @@
   </div>
 
   <div class="mb-4 transition-all duration-300 hover:transform hover:scale-[1.01]">
-    <label for="desc" class="block text-sm font-medium text-slate-300 mb-1">Task Description</label>
+    <label for="desc" class="block text-sm font-medium text-blue-400 mb-1">Task Description</label>
     <textarea
       id="desc"
       rows="3"
       name="desc"
       placeholder="Add more details about your task..."
-      class="w-full p-3 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+      class="w-full p-3 rounded-xl border border-blue-900/50 bg-black/80 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200 placeholder-blue-900/50"
       [(ngModel)]="desc"
       (ngModelChange)="handleChange()"
     ></textarea>
   </div>
 
   <div class="mb-4 transition-all duration-300 hover:transform hover:scale-[1.01]">
-    <label for="deadline" class="block text-sm font-medium text-slate-300 mb-1">Deadline</label>
+    <label for="deadline" class="block text-sm font-medium text-blue-400 mb-1">Deadline</label>
     <input
       type="date"
       id="deadline"
       name="deadline"
-      class="w-full p-3 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+      class="w-full p-3 rounded-xl border border-blue-900/50 bg-black/80 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200"
       [(ngModel)]="deadline"
       (ngModelChange)="handleChange()"
     />
   </div>
 
   <div class="mb-5 transition-all duration-300 hover:transform hover:scale-[1.01]">
-    <label for="priority" class="block text-sm font-medium text-slate-300 mb-1">Priority</label>
+    <label for="priority" class="block text-sm font-medium text-blue-400 mb-1">Priority</label>
     <select
       id="priority"
       name="priority"
-      class="w-full p-3 rounded-xl border border-slate-700 bg-slate-900 text-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+      class="w-full p-3 rounded-xl border border-blue-900/50 bg-black/80 text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200"
       [(ngModel)]="priority"
     >
       <option value="Low">Low</option>
@@ -63,7 +70,7 @@
   <button
     type="submit"
     [disabled]="disable"
-    class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+    class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-medium py-3 px-4 rounded-xl transition-all duration-300 hover:from-blue-700 hover:to-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_15px_rgba(59,130,246,0.3)] hover:shadow-[0_0_20px_rgba(59,130,246,0.5)] neon-button"
   >
     <div class="flex items-center justify-center">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
