@@ -1,0 +1,117 @@
+/* Game board styling */
+.card {
+  perspective: 1000px;
+  transition: transform 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+/* Animation for particles */
+.particle {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.2;
+}
+
+.particle-1 {
+  top: 10%;
+  left: 10%;
+  background: radial-gradient(circle, rgba(138,43,226,0.3) 0%, transparent 70%);
+  animation: float 15s ease-in-out infinite;
+}
+
+.particle-2 {
+  top: 60%;
+  right: 10%;
+  background: radial-gradient(circle, rgba(75,0,130,0.2) 0%, transparent 70%);
+  animation: float 20s ease-in-out infinite reverse;
+}
+
+.particle-3 {
+  bottom: 5%;
+  left: 30%;
+  background: radial-gradient(circle, rgba(106,90,205,0.15) 0%, transparent 70%);
+  animation: float 25s ease-in-out infinite;
+}
+
+.particle-4 {
+  top: 40%;
+  left: 60%;
+  background: radial-gradient(circle, rgba(147,112,219,0.2) 0%, transparent 70%);
+  animation: float 18s ease-in-out infinite reverse;
+}
+
+.particle-5 {
+  top: 10%;
+  right: 30%;
+  background: radial-gradient(circle, rgba(186,85,211,0.15) 0%, transparent 70%);
+  animation: float 22s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(30px, 20px) scale(1.2);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/* Custom cursor styles */
+.cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  background-color: rgba(139, 92, 246, 0.9);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.2s ease-out;
+  filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.5));
+}
+
+.cursor-trail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background-color: rgba(139, 92, 246, 0.2);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: all 0.15s ease-out;
+}
+
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(139, 92, 246, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9997;
+  transform: translate(-50%, -50%);
+  transition: all 0.2s ease-out;
+  background-color: rgba(139, 92, 246, 0.08);
+}
+
+/* Wave effect styles */
+.wave {
+  --x: 50%;
+  --y: 50%;
+} 

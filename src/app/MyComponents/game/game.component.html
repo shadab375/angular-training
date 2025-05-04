@@ -1,0 +1,176 @@
+<div class="min-h-screen bg-black bg-opacity-95 p-4">
+  <!-- Animated background particles -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="particle particle-1"></div>
+    <div class="particle particle-2"></div>
+    <div class="particle particle-3"></div>
+    <div class="particle particle-4"></div>
+    <div class="particle particle-5"></div>
+  </div>
+  
+  <header class="max-w-7xl mx-auto mb-8 z-10 relative">
+    <div class="bg-black/80 backdrop-blur-xl rounded-2xl shadow-lg p-6 flex items-center justify-between border border-purple-900/50">
+      <div class="flex items-center">
+        <div class="p-3 rounded-xl bg-gradient-to-br from-violet-600 to-blue-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h1 class="ml-4 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">Memory Match</h1>
+      </div>
+      <div>
+        <a routerLink="/" class="px-4 py-2 bg-black border border-purple-700/50 hover:border-purple-500 text-purple-400 hover:text-purple-300 rounded-lg transition-all duration-300 flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7m-7-7v14" />
+          </svg>
+          <span>Back to Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto z-10 relative">
+    <!-- Game information panel -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <!-- Game stats -->
+      <div class="bg-black/80 backdrop-blur-xl rounded-2xl p-6 border border-blue-900/50">
+        <div class="flex items-center">
+          <div class="p-3 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-blue-400 font-medium">Moves</p>
+            <p class="text-2xl font-bold text-white">{{moves}}</p>
+          </div>
+        </div>
+      </div>
+      <!-- Timer -->
+      <div class="bg-black/80 backdrop-blur-xl rounded-2xl p-6 border border-purple-900/50">
+        <div class="flex items-center">
+          <div class="p-3 rounded-xl bg-gradient-to-br from-violet-600 to-purple-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-purple-400 font-medium">Time</p>
+            <p class="text-2xl font-bold text-white">{{getFormattedTime(currentTime)}}</p>
+          </div>
+        </div>
+      </div>
+      <!-- Progress -->
+      <div class="bg-black/80 backdrop-blur-xl rounded-2xl p-6 border border-emerald-900/50">
+        <div class="flex items-center">
+          <div class="p-3 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div class="ml-4">
+            <p class="text-emerald-400 font-medium">Matched</p>
+            <p class="text-2xl font-bold text-white">{{matchedPairs}}/{{totalPairs}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Game Controls -->
+    <div class="bg-black/80 backdrop-blur-xl rounded-2xl p-6 mb-8 border border-purple-900/50">
+      <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+        <h2 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400">Game Settings</h2>
+        
+        <div class="flex flex-wrap gap-3 justify-center">
+          <button 
+            (click)="setDifficulty('easy')" 
+            class="px-4 py-2 rounded-lg border"
+            [ngClass]="{'border-green-500 text-green-400': difficultyLevel === 'easy', 'border-gray-700 text-gray-400': difficultyLevel !== 'easy'}"
+          >
+            Easy
+          </button>
+          <button 
+            (click)="setDifficulty('medium')" 
+            class="px-4 py-2 rounded-lg border"
+            [ngClass]="{'border-yellow-500 text-yellow-400': difficultyLevel === 'medium', 'border-gray-700 text-gray-400': difficultyLevel !== 'medium'}"
+          >
+            Medium
+          </button>
+          <button 
+            (click)="setDifficulty('hard')" 
+            class="px-4 py-2 rounded-lg border"
+            [ngClass]="{'border-red-500 text-red-400': difficultyLevel === 'hard', 'border-gray-700 text-gray-400': difficultyLevel !== 'hard'}"
+          >
+            Hard
+          </button>
+        </div>
+        
+        <button 
+          (click)="resetGame()" 
+          class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg flex items-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Reset Game
+        </button>
+      </div>
+    </div>
+    
+    <!-- Game Board -->
+    <div class="bg-black/80 backdrop-blur-xl rounded-2xl p-6 border border-purple-900/50">
+      <div class="relative">
+        <div class="relative">
+          <!-- Game board grid -->
+          <div [style.grid-template-columns]="'repeat(' + gridColumns + ', minmax(0, 1fr))'" class="grid gap-4">
+            <div 
+              *ngFor="let card of cards" 
+              (click)="flipCard(card)"
+              class="card aspect-square cursor-pointer"
+              [ngClass]="{'opacity-100': !card.matched, 'opacity-60': card.matched}"
+            >
+              <div class="relative w-full h-full">
+                <div class="absolute inset-0 flex items-center justify-center rounded-xl bg-gradient-to-br" 
+                     [ngClass]="{'from-violet-900 to-indigo-900 border-2 border-violet-500': card.flipped, 
+                                'from-gray-900 to-gray-800 border border-violet-700/30': !card.flipped}">
+                  <span *ngIf="card.flipped" class="text-4xl">{{card.emoji}}</span>
+                  <span *ngIf="!card.flipped" class="text-xl text-violet-300">?</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Game start prompt -->
+          <div *ngIf="!gameStarted && !gameCompleted" class="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center rounded-xl">
+            <div class="text-center p-6 rounded-xl bg-black/80 border border-purple-700/50">
+              <h3 class="text-xl font-bold text-white mb-2">Ready to Play?</h3>
+              <p class="text-slate-300 mb-4">Find matching pairs of cards by flipping them</p>
+              <button 
+                (click)="cards.length > 0 && startGame()" 
+                class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg"
+              >
+                Start Game
+              </button>
+            </div>
+          </div>
+
+          <!-- Game completed -->
+          <div *ngIf="gameCompleted" class="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center rounded-xl">
+            <div class="text-center p-6 rounded-xl bg-black/80 border border-purple-700/50">
+              <h3 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 mb-2">Game Completed!</h3>
+              <p class="text-slate-300 mb-1">Moves: <span class="text-white font-bold">{{moves}}</span></p>
+              <p class="text-slate-300 mb-4">Time: <span class="text-white font-bold">{{getFormattedTime(currentTime)}}</span></p>
+              <button 
+                (click)="resetGame()" 
+                class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-700 text-white rounded-lg"
+              >
+                Play Again
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div> 

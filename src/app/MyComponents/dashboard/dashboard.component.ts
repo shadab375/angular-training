@@ -1,7 +1,7 @@
 import { Component, OnInit, AfterViewInit, HostListener, ElementRef, ViewChild, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { TodoAddComponent } from '../todo-add/todo-add.component';
 import { TodoService } from '../../service/todo.service';
 import { GeminiService } from '../../Services/gemini.service';
@@ -12,7 +12,7 @@ import { trigger, state, style, animate, transition, query, stagger, keyframes, 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [TodoAddComponent, CommonModule, FormsModule, DatePipe],
+  imports: [TodoAddComponent, CommonModule, FormsModule, DatePipe, RouterModule],
   templateUrl: './dashboard.component.html',
   animations: [
     trigger('fadeAnimation', [
