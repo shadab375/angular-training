@@ -106,19 +106,6 @@
       "id": "2Py9s8E"
     },
     {
-      "name": "Homework",
-      "desc": "Do homework",
-      "deadline": "2025-05-09",
-      "category": "General",
-      "tags": [],
-      "userId": "1746338967533",
-      "completed": false,
-      "priority": "Medium",
-      "createdAt": "2025-05-06T17:34:19.992Z",
-      "updatedAt": "2025-05-06T17:34:19.992Z",
-      "id": "4BTb0cH"
-    },
-    {
       "name": "Do hair",
       "desc": "Do hair",
       "deadline": "2025-05-30",
@@ -132,7 +119,7 @@
       "id": "r56qkGH"
     },
     {
-      "name": "See a doctor",
+      "name": "See a cardiologist",
       "desc": "Go see a doctor",
       "deadline": "2025-05-10",
       "category": "General",
@@ -141,8 +128,21 @@
       "completed": false,
       "priority": "Medium",
       "createdAt": "2025-05-06T17:36:26.469Z",
-      "updatedAt": "2025-05-06T17:36:26.469Z",
+      "updatedAt": "2025-05-06T17:38:33.774Z",
       "id": "UUuo1CG"
+    },
+    {
+      "name": "Laundry",
+      "desc": "Do laundry",
+      "deadline": "2025-05-13",
+      "category": "General",
+      "tags": [],
+      "userId": "1746338967533",
+      "completed": false,
+      "priority": "Low",
+      "createdAt": "2025-05-06T17:37:56.196Z",
+      "updatedAt": "2025-05-06T17:37:56.196Z",
+      "id": "nP1IrWF"
     }
   ],
   "users": [

@@ -61,6 +61,16 @@ export class GeminiService {
     nextMonthEnd.setDate(nextMonthEnd.getDate() - 1);
     nextMonthEnd.setDate(nextMonthEnd.getDate() + 1);
 
+    // Calculate within a week (7 days from now)
+    const withinWeek = new Date(now);
+    withinWeek.setDate(now.getDate() + 7);
+    withinWeek.setHours(12, 0, 0, 0);
+
+    // Calculate within a month (30 days from now)
+    const withinMonth = new Date(now);
+    withinMonth.setDate(now.getDate() + 30);
+    withinMonth.setHours(12, 0, 0, 0);
+
     console.group('Current Time Periods');
     console.log('Current Date:', now.toLocaleDateString());
     console.log('Current Day:', currentDayName);
@@ -71,6 +81,8 @@ export class GeminiService {
     console.log('End of Month:', endOfMonth.toLocaleDateString());
     console.log('Next Week:', nextWeekStart.toLocaleDateString(), 'to', nextWeekEnd.toLocaleDateString());
     console.log('Next Month:', nextMonthStart.toLocaleDateString(), 'to', nextMonthEnd.toLocaleDateString());
+    console.log('Within Week:', withinWeek.toLocaleDateString());
+    console.log('Within Month:', withinMonth.toLocaleDateString());
     console.groupEnd();
 
     // Store these values for reference
@@ -88,7 +100,9 @@ export class GeminiService {
       nextMonth: {
         start: nextMonthStart.toLocaleDateString(),
         end: nextMonthEnd.toLocaleDateString()
-      }
+      },
+      withinWeek: withinWeek.toLocaleDateString(),
+      withinMonth: withinMonth.toLocaleDateString()
     };
   }
 
@@ -136,6 +150,8 @@ IMPORTANT: Use these EXACT dates for time-based requests:
 - For "end of month" or "by end of month" → Use: ${timeInfo.endOfMonth}
 - For "next week" → Use: ${timeInfo.nextWeek.start} to ${timeInfo.nextWeek.end}
 - For "next month" → Use: ${timeInfo.nextMonth.start} to ${timeInfo.nextMonth.end}
+- For "within a week" or "in a week" → Use: ${timeInfo.currentDate} to ${timeInfo.withinWeek}
+- For "within a month" or "in a month" → Use: ${timeInfo.currentDate} to ${timeInfo.withinMonth}
 
 Current time information:
 - Today is ${timeInfo.currentDate}
@@ -148,7 +164,9 @@ When setting deadlines:
 2. If user mentions "end of month" → Use ${timeInfo.endOfMonth}
 3. If user mentions "next week" → Use ${timeInfo.nextWeek.start}
 4. If user mentions "next month" → Use ${timeInfo.nextMonth.start}
-5. For any other date, use the current year (${currentYear}) unless explicitly specified otherwise
+5. If user mentions "within a week" or "in a week" → Use ${timeInfo.withinWeek}
+6. If user mentions "within a month" or "in a month" → Use ${timeInfo.withinMonth}
+7. For any other date, use the current year (${currentYear}) unless explicitly specified otherwise
 
 Determine if this is a request to:
 1. Create a new task
@@ -201,7 +219,7 @@ For time-based queries:
 {
   "operation": "timeQuery",
   "timeFrame": {
-    "type": "week" | "month" | "endOfWeek" | "endOfMonth",
+    "type": "week" | "month" | "endOfWeek" | "endOfMonth" | "withinWeek" | "withinMonth",
     "startDate": "YYYY-MM-DD" (MUST use one of the exact dates above),
     "endDate": "YYYY-MM-DD" (MUST use one of the exact dates above)
   }
@@ -384,6 +402,7 @@ ${JSON.stringify(taskContext, null, 2)}
         startDate = new Date(now);
         // End after 30 days
         endDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+        endDate.setDate(endDate.getDate() + 1);
         break;
 
       case 'endOfWeek':
@@ -392,14 +411,16 @@ ${JSON.stringify(taskContext, null, 2)}
         // Calculate days until Saturday (6 is Saturday in getDay())
         const daysUntilSaturday = (6 - now.getDay() + 7) % 7;
         endDate = new Date(now);
-        endDate.setDate(now.getDate() + daysUntilSaturday);
+        endDate.setDate(now.getDate() + daysUntilSaturday + 1);
         break;
 
       case 'endOfMonth':
         // Start from today
         startDate = new Date(now);
         // Get the last day of the current month
-        endDate = new Date(currentYear, currentMonth + 1, 0, 12, 0, 0, 0);
+        endDate = new Date(currentYear, currentMonth + 1, 1, 12, 0, 0, 0);
+        endDate.setDate(endDate.getDate() - 1);
+        endDate.setDate(endDate.getDate() + 1);
         break;
 
       case 'nextWeek':
@@ -409,14 +430,32 @@ ${JSON.stringify(taskContext, null, 2)}
         startDate.setDate(now.getDate() + daysUntilMonday);
         // End on next Sunday
         endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 6);
+        endDate.setDate(startDate.getDate() + 6 + 1);
         break;
 
       case 'nextMonth':
         // Start from first day of next month
         startDate = new Date(currentYear, currentMonth + 1, 1, 12, 0, 0, 0);
         // End on last day of next month
-        endDate = new Date(currentYear, currentMonth + 2, 0, 12, 0, 0, 0);
+        endDate = new Date(currentYear, currentMonth + 2, 1, 12, 0, 0, 0);
+        endDate.setDate(endDate.getDate() - 1);
+        endDate.setDate(endDate.getDate() + 1);
+        break;
+
+      case 'withinWeek':
+        // Start from today
+        startDate = new Date(now);
+        // End after 7 days
+        endDate = new Date(now);
+        endDate.setDate(now.getDate() + 7);
+        break;
+
+      case 'withinMonth':
+        // Start from today
+        startDate = new Date(now);
+        // End after 30 days
+        endDate = new Date(now);
+        endDate.setDate(now.getDate() + 30);
         break;
 
       default:
