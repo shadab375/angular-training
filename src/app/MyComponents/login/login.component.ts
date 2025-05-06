@@ -1,7 +1,7 @@
-import { Component, AfterViewInit, Renderer2, OnDestroy } from '@angular/core';
+import { Component, AfterViewInit, Renderer2, OnDestroy, PLATFORM_ID, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../Services/auth.service';
 import { trigger, transition, style, animate } from '@angular/animations';
 
@@ -44,7 +44,8 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
     private formBuilder: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     // Redirect if already logged in
     if (this.authService.isLoggedIn) {
@@ -58,12 +59,14 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   }
   
   ngAfterViewInit(): void {
-    // Initialize custom cursor and wave effects
-    setTimeout(() => {
-      this.initCustomCursor();
-      this.initWaveEffect();
-      this.addCursorHoverEffects();
-    }, 500);
+    // Only initialize cursor and wave effects in browser environment
+    if (isPlatformBrowser(this.platformId)) {
+      setTimeout(() => {
+        this.initCustomCursor();
+        this.initWaveEffect();
+        this.addCursorHoverEffects();
+      }, 500);
+    }
   }
   
   ngOnDestroy(): void {
@@ -102,6 +105,8 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   
   // Initialize wave effect that responds to cursor movement
   private initWaveEffect(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
     this.waveBg = document.querySelector('.wave-bg');
     if (!this.waveBg) {
       // Create wave background if it doesn't exist
@@ -168,6 +173,8 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
 
   // Custom cursor initialization
   private initCustomCursor(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
     // Create custom cursor elements if they don't exist
     if (!document.querySelector('.cursor-dot')) {
       // Main cursor dot
@@ -275,6 +282,8 @@ export class LoginComponent implements AfterViewInit, OnDestroy {
   }
   
   private addCursorHoverEffects(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
     // Collect all interactive elements
     const interactiveElements = document.querySelectorAll('button, a, input, textarea, select');
     
