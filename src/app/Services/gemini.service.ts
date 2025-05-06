@@ -18,7 +18,87 @@ export class GeminiService {
   constructor(
     private http: HttpClient,
     private todoService: TodoService
-  ) {}
+  ) {
+    // Log current time periods on service initialization
+    this.logCurrentTimePeriods();
+  }
+
+  // Method to log current time periods
+  logCurrentTimePeriods(): void {
+    const now = new Date();
+    // Set time to noon to avoid timezone issues
+    now.setHours(12, 0, 0, 0);
+    
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    const currentDay = now.getDate();
+    const currentDayName = now.toLocaleDateString('en-US', { weekday: 'long' });
+
+    // Calculate end of week (Saturday)
+    const daysUntilSaturday = (6 - now.getDay() + 7) % 7;
+    const endOfWeek = new Date(now);
+    endOfWeek.setDate(now.getDate() + daysUntilSaturday + 1);
+    endOfWeek.setHours(12, 0, 0, 0);
+
+    // Calculate end of month
+    const endOfMonth = new Date(currentYear, currentMonth + 1, 1, 12, 0, 0, 0);
+    endOfMonth.setDate(endOfMonth.getDate() - 1);
+    endOfMonth.setDate(endOfMonth.getDate() + 1);
+
+    // Calculate next week
+    const daysUntilMonday = (1 - now.getDay() + 7) % 7;
+    const nextWeekStart = new Date(now);
+    nextWeekStart.setDate(now.getDate() + daysUntilMonday);
+    nextWeekStart.setHours(12, 0, 0, 0);
+    
+    const nextWeekEnd = new Date(nextWeekStart);
+    nextWeekEnd.setDate(nextWeekStart.getDate() + 6 + 1);
+    nextWeekEnd.setHours(12, 0, 0, 0);
+
+    // Calculate next month
+    const nextMonthStart = new Date(currentYear, currentMonth + 1, 1, 12, 0, 0, 0);
+    const nextMonthEnd = new Date(currentYear, currentMonth + 2, 1, 12, 0, 0, 0);
+    nextMonthEnd.setDate(nextMonthEnd.getDate() - 1);
+    nextMonthEnd.setDate(nextMonthEnd.getDate() + 1);
+
+    console.group('Current Time Periods');
+    console.log('Current Date:', now.toLocaleDateString());
+    console.log('Current Day:', currentDayName);
+    console.log('Current Month:', now.toLocaleDateString('en-US', { month: 'long' }));
+    console.log('Current Year:', currentYear);
+    console.log('\nTime Periods:');
+    console.log('End of Week:', endOfWeek.toLocaleDateString());
+    console.log('End of Month:', endOfMonth.toLocaleDateString());
+    console.log('Next Week:', nextWeekStart.toLocaleDateString(), 'to', nextWeekEnd.toLocaleDateString());
+    console.log('Next Month:', nextMonthStart.toLocaleDateString(), 'to', nextMonthEnd.toLocaleDateString());
+    console.groupEnd();
+
+    // Store these values for reference
+    this.currentTimePeriods = {
+      currentDate: now.toLocaleDateString(),
+      currentDay: currentDayName,
+      currentMonth: now.toLocaleDateString('en-US', { month: 'long' }),
+      currentYear: currentYear,
+      endOfWeek: endOfWeek.toLocaleDateString(),
+      endOfMonth: endOfMonth.toLocaleDateString(),
+      nextWeek: {
+        start: nextWeekStart.toLocaleDateString(),
+        end: nextWeekEnd.toLocaleDateString()
+      },
+      nextMonth: {
+        start: nextMonthStart.toLocaleDateString(),
+        end: nextMonthEnd.toLocaleDateString()
+      }
+    };
+  }
+
+  // Property to store current time periods
+  private currentTimePeriods: any;
+
+  // Method to get current time periods
+  getCurrentTimePeriods(): any {
+    return this.currentTimePeriods;
+  }
 
   // Basic function to get response from Gemini
   getGeminiResponse(prompt: string): Observable<any> {
@@ -43,17 +123,40 @@ export class GeminiService {
   // Process user query for CRUD operations
   processTaskOperation(userQuery: string, taskContext: any[]): Observable<any> {
     // First, determine if this is a CRUD operation
+    const currentYear = new Date().getFullYear();
+    const timeInfo = this.getCurrentTimePeriods();
+    
     const prompt = `
 You are a task management assistant. Analyze the following user request:
 
 "${userQuery}"
+
+IMPORTANT: Use these EXACT dates for time-based requests:
+- For "end of week" or "by end of week" → Use: ${timeInfo.endOfWeek}
+- For "end of month" or "by end of month" → Use: ${timeInfo.endOfMonth}
+- For "next week" → Use: ${timeInfo.nextWeek.start} to ${timeInfo.nextWeek.end}
+- For "next month" → Use: ${timeInfo.nextMonth.start} to ${timeInfo.nextMonth.end}
+
+Current time information:
+- Today is ${timeInfo.currentDate}
+- Current day: ${timeInfo.currentDay}
+- Current month: ${timeInfo.currentMonth}
+- Current year: ${timeInfo.currentYear}
+
+When setting deadlines:
+1. If user mentions "end of week" → Use ${timeInfo.endOfWeek}
+2. If user mentions "end of month" → Use ${timeInfo.endOfMonth}
+3. If user mentions "next week" → Use ${timeInfo.nextWeek.start}
+4. If user mentions "next month" → Use ${timeInfo.nextMonth.start}
+5. For any other date, use the current year (${currentYear}) unless explicitly specified otherwise
 
 Determine if this is a request to:
 1. Create a new task
 2. Update/edit an existing task
 3. Mark a task as complete
 4. Delete a task
-5. None of the above (just a question about tasks)
+5. Query tasks based on time period
+6. None of the above (just a question about tasks)
 
 Respond with ONLY ONE of the following JSON formats:
 
@@ -63,7 +166,7 @@ For task creation:
   "details": {
     "name": "task name",
     "desc": "task description",
-    "deadline": "YYYY-MM-DD" (if mentioned, otherwise null),
+    "deadline": "YYYY-MM-DD" (MUST use one of the exact dates above for time-based requests),
     "category": "category name" (if mentioned, otherwise "General"),
     "tags": ["tag1", "tag2"] (if mentioned, otherwise [])
   }
@@ -76,7 +179,7 @@ For task update:
   "details": {
     "name": "new task name" (if changing, otherwise null),
     "desc": "new description" (if changing, otherwise null),
-    "deadline": "YYYY-MM-DD" (if changing, otherwise null),
+    "deadline": "YYYY-MM-DD" (MUST use one of the exact dates above for time-based requests),
     "category": "new category" (if changing, otherwise null),
     "tags": ["tag1", "tag2"] (if changing, otherwise null)
   }
@@ -92,6 +195,16 @@ For task deletion:
 {
   "operation": "delete",
   "targetTask": "exact name of the task to delete"
+}
+
+For time-based queries:
+{
+  "operation": "timeQuery",
+  "timeFrame": {
+    "type": "week" | "month" | "endOfWeek" | "endOfMonth",
+    "startDate": "YYYY-MM-DD" (MUST use one of the exact dates above),
+    "endDate": "YYYY-MM-DD" (MUST use one of the exact dates above)
+  }
 }
 
 For regular questions:
@@ -115,6 +228,31 @@ ${JSON.stringify(taskContext, null, 2)}
             const jsonMatch = responseText.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
               const jsonResponse = JSON.parse(jsonMatch[0]);
+              
+              // Ensure dates use the correct time periods
+              if (jsonResponse.operation === 'create' || jsonResponse.operation === 'update') {
+                const details = jsonResponse.details;
+                if (details && details.deadline) {
+                  // Convert the deadline to a Date object
+                  const deadlineDate = new Date(details.deadline);
+                  
+                  // Check if the deadline matches any of our time periods
+                  const deadlineStr = deadlineDate.toLocaleDateString();
+                  if (deadlineStr === timeInfo.endOfWeek) {
+                    details.deadline = new Date(timeInfo.endOfWeek).toISOString().split('T')[0];
+                  } else if (deadlineStr === timeInfo.endOfMonth) {
+                    details.deadline = new Date(timeInfo.endOfMonth).toISOString().split('T')[0];
+                  } else if (deadlineStr === timeInfo.nextWeek.start) {
+                    details.deadline = new Date(timeInfo.nextWeek.start).toISOString().split('T')[0];
+                  } else if (deadlineStr === timeInfo.nextMonth.start) {
+                    details.deadline = new Date(timeInfo.nextMonth.start).toISOString().split('T')[0];
+                  } else if (deadlineDate.getFullYear() !== currentYear) {
+                    deadlineDate.setFullYear(currentYear);
+                    details.deadline = deadlineDate.toISOString().split('T')[0];
+                  }
+                }
+              }
+              
               return {
                 operation: jsonResponse.operation,
                 data: jsonResponse,
@@ -203,9 +341,95 @@ ${JSON.stringify(taskContext, null, 2)}
         return this.todoService.deleteTask(taskToDelete.id).pipe(
           map(() => ({ success: true, message: `Task "${data.targetTask}" deleted successfully.` }))
         );
+
+      case 'timeQuery':
+        const { startDate, endDate } = data.timeFrame;
+        const filteredTasks = tasks.filter(task => {
+          const taskDate = new Date(task.deadline);
+          return taskDate >= new Date(startDate) && taskDate <= new Date(endDate);
+        });
+        
+        return of({
+          success: true,
+          tasks: filteredTasks,
+          message: `Found ${filteredTasks.length} tasks for the specified time period.`
+        });
       
       default:
-        return of({ success: true, isQuery: true });
+        return of({ success: false, message: 'Invalid operation.' });
     }
+  }
+
+  // Helper method to calculate time periods
+  private calculateTimePeriod(type: string): { startDate: string, endDate: string } {
+    const now = new Date();
+    // Set time to noon to avoid timezone issues
+    now.setHours(12, 0, 0, 0);
+    
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    let startDate: Date, endDate: Date;
+
+    switch (type) {
+      case 'week':
+        // Start from today
+        startDate = new Date(now);
+        // End after 7 days
+        endDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        endDate.setDate(endDate.getDate() + 1);
+        break;
+
+      case 'month':
+        // Start from today
+        startDate = new Date(now);
+        // End after 30 days
+        endDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+        break;
+
+      case 'endOfWeek':
+        // Start from today
+        startDate = new Date(now);
+        // Calculate days until Saturday (6 is Saturday in getDay())
+        const daysUntilSaturday = (6 - now.getDay() + 7) % 7;
+        endDate = new Date(now);
+        endDate.setDate(now.getDate() + daysUntilSaturday);
+        break;
+
+      case 'endOfMonth':
+        // Start from today
+        startDate = new Date(now);
+        // Get the last day of the current month
+        endDate = new Date(currentYear, currentMonth + 1, 0, 12, 0, 0, 0);
+        break;
+
+      case 'nextWeek':
+        // Start from next Monday
+        const daysUntilMonday = (1 - now.getDay() + 7) % 7;
+        startDate = new Date(now);
+        startDate.setDate(now.getDate() + daysUntilMonday);
+        // End on next Sunday
+        endDate = new Date(startDate);
+        endDate.setDate(startDate.getDate() + 6);
+        break;
+
+      case 'nextMonth':
+        // Start from first day of next month
+        startDate = new Date(currentYear, currentMonth + 1, 1, 12, 0, 0, 0);
+        // End on last day of next month
+        endDate = new Date(currentYear, currentMonth + 2, 0, 12, 0, 0, 0);
+        break;
+
+      default:
+        throw new Error('Invalid time period type');
+    }
+
+    // Ensure all dates are set to noon to avoid timezone issues
+    startDate.setHours(12, 0, 0, 0);
+    endDate.setHours(12, 0, 0, 0);
+
+    return {
+      startDate: startDate.toISOString().split('T')[0],
+      endDate: endDate.toISOString().split('T')[0]
+    };
   }
 } 
