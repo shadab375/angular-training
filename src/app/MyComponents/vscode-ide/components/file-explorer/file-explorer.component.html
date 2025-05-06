@@ -1,0 +1,184 @@
+<div class="file-explorer" (contextmenu)="$event.preventDefault()">
+  <div class="section-header">
+    <h3>EXPLORER</h3>
+    <div class="actions">
+      <button class="action-button" (click)="addNewItem(null, 'file')" title="New File">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      </button>
+      <button class="action-button" (click)="addNewItem(null, 'folder')" title="New Folder">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m4-11v2a2 2 0 01-2 2H8a2 2 0 01-2-2V8m18 0H2" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- New Item Input -->
+  <div class="new-item-input" *ngIf="showNewItemInput">
+    <input 
+      #newItemInput
+      type="text" 
+      [(ngModel)]="newItemName" 
+      placeholder="Enter name..." 
+      (keydown.enter)="confirmNewItem()"
+      (keydown.escape)="cancelNewItem()"
+    />
+    <div class="new-item-actions">
+      <button (click)="confirmNewItem()">Create</button>
+      <button (click)="cancelNewItem()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="file-tree">
+    <ul>
+      @for (folder of files; track folder.id) {
+        <li [ngClass]="{'folder': folder.type === 'folder', 'file': folder.type === 'file'}" 
+            (contextmenu)="onContextMenu($event, folder)">
+          @if (folder.isEditing) {
+            <input 
+              type="text" 
+              [id]="'rename-' + folder.id"
+              [value]="folder.name" 
+              (blur)="finishRenaming(folder, $event)" 
+              (keydown.enter)="finishRenaming(folder, $event)"
+              (keydown.escape)="folder.isEditing = false"
+              (click)="$event.stopPropagation()"
+            />
+          } @else {
+            <div class="folder-header" (click)="toggleFolder(folder, $event)" *ngIf="folder.type === 'folder'">
+              <span class="icon">
+                <svg *ngIf="folder.isOpen" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+                <svg *ngIf="!folder.isOpen" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </span>
+              <span class="folder-name">{{ folder.name }}</span>
+            </div>
+            <div class="file-item" *ngIf="folder.type === 'file'" (click)="selectFile(folder, $event)">
+              <span class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </span>
+              <span class="file-name">{{ folder.name }}</span>
+            </div>
+          }
+          
+          @if (folder.type === 'folder' && folder.isOpen) {
+            <ul class="folder-contents">
+              @for (file of folder.children; track file.id) {
+                <li [ngClass]="{'folder': file.type === 'folder', 'file': file.type === 'file'}" 
+                    (contextmenu)="onContextMenu($event, file)">
+                  @if (file.isEditing) {
+                    <input 
+                      type="text" 
+                      [id]="'rename-' + file.id"
+                      [value]="file.name" 
+                      (blur)="finishRenaming(file, $event)" 
+                      (keydown.enter)="finishRenaming(file, $event)"
+                      (keydown.escape)="file.isEditing = false"
+                      (click)="$event.stopPropagation()"
+                    />
+                  } @else {
+                    @if (file.type === 'folder') {
+                      <div class="folder-header" (click)="toggleFolder(file, $event)">
+                        <span class="icon">
+                          <svg *ngIf="file.isOpen" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                          <svg *ngIf="!file.isOpen" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                        <span class="folder-name">{{ file.name }}</span>
+                      </div>
+                    } @else {
+                      <div class="file-item" (click)="selectFile(file, $event)">
+                        <span class="icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </span>
+                        <span class="file-name">{{ file.name }}</span>
+                      </div>
+                    }
+                  }
+                  
+                  @if (file.type === 'folder' && file.isOpen && file.children && file.children.length > 0) {
+                    <ng-container [ngTemplateOutlet]="recursiveFolderTemplate" [ngTemplateOutletContext]="{folder: file}"></ng-container>
+                  }
+                </li>
+              }
+            </ul>
+          }
+        </li>
+      }
+    </ul>
+  </div>
+
+  <!-- Context Menu -->
+  <div #contextMenu class="context-menu" [ngStyle]="{'top': contextMenuPosition.y, 'left': contextMenuPosition.x}" *ngIf="showContextMenu">
+    <ul>
+      @if (selectedNode && selectedNode.type === 'folder') {
+        <li (click)="addNewItem(selectedNode, 'file'); $event.stopPropagation()">New File</li>
+        <li (click)="addNewItem(selectedNode, 'folder'); $event.stopPropagation()">New Folder</li>
+        <li class="divider"></li>
+      }
+      <li (click)="startRenaming(selectedNode!, $event); $event.stopPropagation()">Rename</li>
+      <li (click)="deleteItem(selectedNode!); $event.stopPropagation()">Delete</li>
+    </ul>
+  </div>
+
+  <!-- Recursive template for nested folders -->
+  <ng-template #recursiveFolderTemplate let-folder="folder">
+    <ul class="folder-contents">
+      @for (childFile of folder.children; track childFile.id) {
+        <li [ngClass]="{'folder': childFile.type === 'folder', 'file': childFile.type === 'file'}" 
+            (contextmenu)="onContextMenu($event, childFile)">
+          @if (childFile.isEditing) {
+            <input 
+              type="text" 
+              [id]="'rename-' + childFile.id"
+              [value]="childFile.name" 
+              (blur)="finishRenaming(childFile, $event)" 
+              (keydown.enter)="finishRenaming(childFile, $event)"
+              (keydown.escape)="childFile.isEditing = false"
+              (click)="$event.stopPropagation()"
+            />
+          } @else {
+            @if (childFile.type === 'folder') {
+              <div class="folder-header" (click)="toggleFolder(childFile, $event)">
+                <span class="icon">
+                  <svg *ngIf="childFile.isOpen" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                  <svg *ngIf="!childFile.isOpen" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+                <span class="folder-name">{{ childFile.name }}</span>
+              </div>
+            } @else {
+              <div class="file-item" (click)="selectFile(childFile, $event)">
+                <span class="icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </span>
+                <span class="file-name">{{ childFile.name }}</span>
+              </div>
+            }
+          }
+          
+          @if (childFile.type === 'folder' && childFile.isOpen && childFile.children && childFile.children.length > 0) {
+            <ng-container [ngTemplateOutlet]="recursiveFolderTemplate" [ngTemplateOutletContext]="{folder: childFile}"></ng-container>
+          }
+        </li>
+      }
+    </ul>
+  </ng-template>
+</div> 

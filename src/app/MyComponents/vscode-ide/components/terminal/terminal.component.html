@@ -1,0 +1,21 @@
+<div class="terminal-container">
+  <div class="terminal-header">
+    <span>TERMINAL</span>
+  </div>
+  <div class="terminal">
+    <div class="terminal-output">
+      @for (line of history; track $index) {
+        <div class="terminal-line">{{ line }}</div>
+      }
+    </div>
+    <div class="terminal-input">
+      <span class="prompt">$</span>
+      <input 
+        type="text" 
+        [(ngModel)]="command" 
+        (keyup.enter)="executeCommand()" 
+        placeholder="Enter command..."
+        class="terminal-command-input" />
+    </div>
+  </div>
+</div> 

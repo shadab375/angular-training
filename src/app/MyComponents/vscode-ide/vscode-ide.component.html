@@ -1,0 +1,119 @@
+<div class="vscode-container">
+  <!-- VSCode IDE Layout -->
+  <div class="vscode-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- File Explorer -->
+      <div class="file-explorer">
+        <div class="section-header">
+          <h3>EXPLORER</h3>
+        </div>
+        <div class="file-tree">
+          <ul>
+            @for (folder of files; track folder.name) {
+              <li class="folder">
+                <div class="folder-header" (click)="folder.isOpen = !folder.isOpen">
+                  <span class="icon">
+                    <svg *ngIf="folder.isOpen" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                    <svg *ngIf="!folder.isOpen" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                  <span class="folder-name">{{ folder.name }}</span>
+                </div>
+                @if (folder.isOpen) {
+                  <ul class="folder-contents">
+                    @for (file of folder.children; track file.name) {
+                      <li class="file" (click)="onFileSelect(file)" [class.active]="activeFile === file">
+                        <span class="icon">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </span>
+                        <span class="file-name">{{ file.name }}</span>
+                      </li>
+                    }
+                  </ul>
+                }
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Editor -->
+      <div class="editor-container">
+        @if (activeFile) {
+          <div class="editor-tabs">
+            <div class="tab active">
+              {{ activeFile.name }}
+            </div>
+          </div>
+          <div class="editor">
+            <textarea 
+              class="code-editor"
+              [(ngModel)]="activeFile.content"
+              (ngModelChange)="onContentChange($event)"
+              spellcheck="false"></textarea>
+          </div>
+        } @else {
+          <div class="welcome-screen">
+            <div class="welcome-content">
+              <h2>Welcome to the VSCode-like IDE</h2>
+              <p>Select a file from the explorer to start editing.</p>
+              <div class="quick-actions">
+                <h3>Quick Start</h3>
+                <ul>
+                  <li>Open a file from the explorer</li>
+                  <li>Create new files using the terminal</li>
+                  <li>Run commands in the terminal</li>
+                  <li>Execute Python scripts with: <code>python filename.py</code></li>
+                  <li>Start React dev server with: <code>npm run dev</code></li>
+                  <li>Run Node.js scripts with: <code>node filename.js</code></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        }
+        
+        <!-- App Preview when running -->
+        @if (outputPreview) {
+          <div [innerHTML]="outputPreview"></div>
+        }
+      </div>
+
+      <!-- Terminal -->
+      <div class="terminal-container">
+        <div class="terminal-header">
+          <span>TERMINAL</span>
+          @if (isRunning || devServerRunning) {
+            <span class="process-indicator">
+              {{ currentProcess ? currentProcess : 'Dev Server' }} Running
+            </span>
+          }
+        </div>
+        <div class="terminal">
+          <div class="terminal-output">
+            @for (line of terminalHistory; track $index) {
+              <div class="terminal-line">{{ line }}</div>
+            }
+          </div>
+          <div class="terminal-input">
+            <span class="prompt">$</span>
+            <input 
+              type="text" 
+              [(ngModel)]="terminalCommand" 
+              (keyup.enter)="executeCommand(terminalCommand)" 
+              placeholder="Enter command..."
+              class="terminal-command-input" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

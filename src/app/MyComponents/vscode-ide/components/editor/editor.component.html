@@ -1,0 +1,23 @@
+<div class="editor-container">
+  @if (file) {
+    <div class="editor-tabs">
+      <div class="tab active">
+        {{ file.name }}
+      </div>
+    </div>
+    <div class="editor">
+      <textarea 
+        class="code-editor"
+        [(ngModel)]="file.content"
+        (ngModelChange)="onContentChange($event)"
+        spellcheck="false"></textarea>
+    </div>
+  } @else {
+    <div class="welcome-screen">
+      <div class="welcome-content">
+        <h2>Welcome to the Editor</h2>
+        <p>Select a file from the explorer to start editing.</p>
+      </div>
+    </div>
+  }
+</div> 

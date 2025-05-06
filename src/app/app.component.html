@@ -11,8 +11,16 @@
         </div>
         <h1 class="ml-4 text-2xl font-bold gradient-text">Task Master Pro</h1>
       </div>
-      <div class="text-sm font-medium text-slate-300">
-        <span>{{today | date:'fullDate'}}</span>
+      <div class="flex items-center space-x-4">
+        <div class="text-sm font-medium text-slate-300">
+          <span>{{today | date:'fullDate'}}</span>
+        </div>
+        <a routerLink="/vscode-ide" class="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-200 transform hover:scale-[1.02] shadow-lg flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+          </svg>
+          VSCode IDE
+        </a>
       </div>
     </div>
   </header>
