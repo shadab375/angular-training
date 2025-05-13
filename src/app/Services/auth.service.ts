@@ -1,95 +1,87 @@
-import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap, catchError, throwError } from 'rxjs';
-import { User, LoginRequest, RegisterRequest, AuthResponse } from '../models/user.model';
-import { isPlatformBrowser } from '@angular/common';
+import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  token: string;
+}
+
+export interface RegisterRequest {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/auth';
+  private apiUrl = environment.apiUrl + '/api/auth';
   private currentUserSubject = new BehaviorSubject<User | null>(null);
-  public currentUser = this.currentUserSubject.asObservable();
-  private isBrowser: boolean;
-  
-  constructor(
-    private http: HttpClient,
-    @Inject(PLATFORM_ID) platformId: Object
-  ) {
-    this.isBrowser = isPlatformBrowser(platformId);
+  public currentUser$ = this.currentUserSubject.asObservable();
+
+  constructor(private http: HttpClient) {
     this.loadUserFromStorage();
   }
 
-  private loadUserFromStorage(): void {
-    if (!this.isBrowser) return;
-    
-    const userData = localStorage.getItem('user');
-    const token = localStorage.getItem('token');
-    
-    if (userData && token) {
-      try {
-        const user = JSON.parse(userData);
-        this.currentUserSubject.next({ ...user, token });
-      } catch (error) {
-        console.error('Error parsing user data from localStorage', error);
-        this.logout();
-      }
-    }
-  }
-
-  register(userData: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData).pipe(
-      tap(response => this.handleAuthResponse(response)),
-      catchError(error => {
-        console.error('Registration error', error);
-        return throwError(() => new Error(error.error?.message || 'Registration failed'));
-      })
-    );
+  register(registerData: RegisterRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, registerData)
+      .pipe(
+        tap(response => this.handleAuthResponse(response))
+      );
   }
 
   login(loginData: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, loginData).pipe(
-      tap(response => this.handleAuthResponse(response)),
-      catchError(error => {
-        console.error('Login error', error);
-        return throwError(() => new Error(error.error?.message || 'Login failed'));
-      })
-    );
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, loginData)
+      .pipe(
+        tap(response => this.handleAuthResponse(response))
+      );
   }
 
   logout(): void {
-    if (!this.isBrowser) return;
-    
-    localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     this.currentUserSubject.next(null);
   }
 
-  private handleAuthResponse(response: AuthResponse): void {
-    if (!this.isBrowser) return;
-    
-    if (response && response.token && response.user) {
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      this.currentUserSubject.next({ ...response.user, token: response.token });
-    }
-  }
-
-  public get currentUserValue(): User | null {
-    return this.currentUserSubject.value;
-  }
-
-  public get isLoggedIn(): boolean {
-    return !!this.currentUserValue;
-  }
-
-  public get token(): string | null {
-    return this.currentUserValue?.token || null;
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
   }
 
   getToken(): string | null {
-    if (!this.isBrowser) return null;
     return localStorage.getItem('token');
+  }
+
+  private handleAuthResponse(response: AuthResponse): void {
+    // Store token and user in local storage
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('user', JSON.stringify(response.user));
+    this.currentUserSubject.next(response.user);
+  }
+
+  private loadUserFromStorage(): void {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr) as User;
+        this.currentUserSubject.next(user);
+      } catch (e) {
+        console.error('Error parsing stored user data', e);
+        this.logout();
+      }
+    }
   }
 } 

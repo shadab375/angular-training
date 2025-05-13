@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TodoAddComponent } from '../todo-add/todo-add.component';
-import { TodoService } from '../../service/todo.service';
+import { TodoService, Todo } from '../../service/todo.service';
 import { GeminiService } from '../../Services/gemini.service';
 import { AuthService } from '../../Services/auth.service';
 import { DatePipe } from '@angular/common';
@@ -76,7 +76,22 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.getTasks();
-    this.userName = this.authService.currentUserValue?.name || 'User';
+    this.authService.currentUser$.subscribe(user => {
+      this.userName = user?.name || 'Guest';
+    });
+    
+    // Verify current user data is loaded
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        if (user && user.name) {
+          this.userName = user.name;
+        }
+      } catch (e) {
+        console.error('Error parsing stored user data', e);
+      }
+    }
   }
 
   get completedTasksCount(): number {
@@ -107,7 +122,7 @@ export class DashboardComponent implements OnInit {
 
   getTasks(): void {
     this.todoService.getTasks().subscribe({
-      next: (res: any) => {
+      next: (res: Todo[]) => {
         this.tasks = res;
         this.sortTasks();
       },
@@ -119,8 +134,17 @@ export class DashboardComponent implements OnInit {
   }
 
   addTask(task: any): void {
-    this.todoService.addTask(task).subscribe({
+    console.log('Adding new task:', task);
+    const todoData = {
+      title: task.name,
+      description: task.desc,  // Use description field for backend
+      deadline: task.deadline,
+      priority: task.priority
+    };
+    
+    this.todoService.addTask(todoData).subscribe({
       next: (res: any) => {
+        console.log('Task added successfully:', res);
         this.showMessage('Task added successfully!');
         this.getTasks();
       },
@@ -153,11 +177,13 @@ export class DashboardComponent implements OnInit {
 
   handleEdit(task: any): void {
     this.edit = true;
-    this.editTask = { ...task };
-    // Convert date string to format compatible with date input
-    if (this.editTask.deadline) {
-      this.editTask.deadline = new Date(this.editTask.deadline).toISOString().split('T')[0];
-    }
+    console.log('Editing task:', task);
+    this.editTask = { 
+      ...task, 
+      name: task.title,  // Map the title field to name for the edit form
+      desc: task.description || task.desc || ''  // Map description to desc for the form
+    };
+    console.log('EditTask object:', this.editTask);
   }
 
   handleComplete(task: any): void {
@@ -166,11 +192,14 @@ export class DashboardComponent implements OnInit {
       return;
     }
 
-    this.todoService.updateTask(task.id, {
+    const completedTask = {
       ...task,
       completed: true,
       completedDate: new Date().toISOString()
-    }).subscribe({
+    };
+    
+    console.log('Marking task as complete with data:', completedTask);
+    this.todoService.updateTask(task.id, completedTask).subscribe({
       next: (res: any) => {
         this.showMessage('Task marked as completed!');
         this.getTasks();
@@ -190,15 +219,17 @@ export class DashboardComponent implements OnInit {
 
     this.edit = false;
     const updatedTask = {
-      name: this.editTask.name,
-      desc: this.editTask.desc,
-      deadline: new Date(this.editTask.deadline).toISOString(),
-      priority: this.editTask.priority,
-      completed: this.editTask.completed
+      title: this.editTask.name,
+      completed: this.editTask.completed,
+      description: this.editTask.desc,  // Map desc from form to description for API
+      deadline: this.editTask.deadline,
+      priority: this.editTask.priority
     };
     
+    console.log('Updating task with data:', updatedTask);
     this.todoService.updateTask(task.id, updatedTask).subscribe({
       next: (res: any) => {
+        console.log('Task updated successfully:', res);
         this.showMessage('Task updated successfully!');
         this.getTasks();
       },
@@ -216,8 +247,7 @@ export class DashboardComponent implements OnInit {
 
   get filteredTasks(): any[] {
     return this.tasks.filter(task => {
-      const matchesSearch = task.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                          task.desc.toLowerCase().includes(this.searchQuery.toLowerCase());
+      const matchesSearch = task.title.toLowerCase().includes(this.searchQuery.toLowerCase());
       return matchesSearch;
     });
   }
@@ -227,10 +257,7 @@ export class DashboardComponent implements OnInit {
       let comparison = 0;
       switch (this.sortBy) {
         case 'name':
-          comparison = a.name.localeCompare(b.name);
-          break;
-        case 'deadline':
-          comparison = new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+          comparison = a.title.localeCompare(b.title);
           break;
         case 'completed':
           comparison = (a.completed === b.completed) ? 0 : a.completed ? 1 : -1;
@@ -278,7 +305,7 @@ export class DashboardComponent implements OnInit {
     // Format task data for the prompt
     const taskContext = this.tasks.map(task => ({
       id: task.id,
-      name: task.name,
+      name: task.title,
       description: task.desc,
       deadline: task.deadline,
       completed: task.completed,

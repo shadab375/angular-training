@@ -30,7 +30,7 @@ export class LoginComponent {
     private router: Router
   ) {
     // Redirect if already logged in
-    if (this.authService.isLoggedIn) {
+    if (this.authService.isLoggedIn()) {
       this.router.navigate(['/']);
     }
 

@@ -1,13 +1,11 @@
 // src\app\MyComponents\todo-add\todo-add.component.ts
 
-import { Component, EventEmitter, Inject, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { NgIf } from '@angular/common';
-import { trigger, state, style, animate, transition } from '@angular/animations';
+import { trigger, style, animate, transition } from '@angular/animations';
 
-
-export @Component({
+@Component({
     selector: 'app-todo-add',
     standalone: true,
     imports: [FormsModule, NgIf],
@@ -26,45 +24,33 @@ export @Component({
         ])
     ]
 })
-
-class TodoAddComponent implements OnInit {
-    task: any;
-
+export class TodoAddComponent implements OnInit {
+    name: string = '';
+    desc: string = '';
+    deadline: string = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    priority: string = 'Medium';
+    disable: boolean = true;
+    @Output() todoAdd: EventEmitter<any> = new EventEmitter();
 
     ngOnInit(): void {
         this.handleChange();
     }
 
-    name: string = 'Sample';
-    desc: string = "Sample description";
-    deadline: string = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    priority: string = "Medium";
-    disable: boolean = true;
-    @Output() todoAdd: EventEmitter<any> = new EventEmitter();
-
     handleChange() {
-        if (this.name.length > 0 && this.desc.length > 0) {
-            this.disable = false;
-        } else {
-            this.disable = true;
-        }
+        this.disable = !(this.name.length > 0);
     }
 
     handleSubmit() {
-        console.log(this.name);
-        console.log(this.desc);
-
         this.todoAdd.emit({
             name: this.name,
             desc: this.desc,
             deadline: this.deadline,
             priority: this.priority
-        } as any)
-        this.name = "";
-        this.desc = "";
+        });
+        this.name = '';
+        this.desc = '';
         this.deadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-        this.priority = "Medium";
+        this.priority = 'Medium';
         this.handleChange();
     }
-
 }

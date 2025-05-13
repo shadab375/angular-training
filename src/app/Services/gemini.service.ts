@@ -1,8 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, map, of } from 'rxjs';
+import { Observable, map, of, tap, catchError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { TodoService } from '../service/todo.service';
+import { TodoService, Todo } from '../service/todo.service';
 
 // TODO: Add environment import later
 // import { environment } from '../../environments/environment';
@@ -129,9 +129,16 @@ export class GeminiService {
     };
 
     const url = `${this.apiUrl}?key=${this.apiKey}`;
+    console.log('Making API request to Gemini:', url);
 
     // TODO: Add error handling
-    return this.http.post<any>(url, body, { headers });
+    return this.http.post<any>(url, body, { headers }).pipe(
+      tap(response => console.log('Gemini API response received:', response)),
+      catchError(error => {
+        console.error('Gemini API request failed:', error);
+        throw error;
+      })
+    );
   }
 
   // Process user query for CRUD operations
@@ -299,82 +306,109 @@ ${JSON.stringify(taskContext, null, 2)}
 
   // Execute the task operation
   executeTaskOperation(operation: string, data: any, tasks: any[]): Observable<any> {
+    console.log(`Executing task operation: ${operation}`, data);
+    
     switch (operation) {
       case 'create':
-        return this.todoService.addTask({
-          name: data.details.name,
-          desc: data.details.desc || '',
-          deadline: data.details.deadline || new Date(Date.now() + 7*24*60*60*1000).toISOString().split('T')[0],
-          category: data.details.category || 'General',
-          tags: data.details.tags || []
-        }).pipe(
+        const todoData: Partial<Todo> = {
+          title: data.details.name,
+          description: data.details.desc || '',
+          deadline: data.details.deadline || null,
+          priority: data.details.category || 'Medium',
+          completed: false
+        };
+        
+        console.log('Creating new task:', todoData);
+        return this.todoService.addTask(todoData).pipe(
+          tap(response => console.log('Backend response - Task created:', response)),
+          catchError(error => {
+            console.error('Backend error - Failed to create task:', error);
+            return of({ success: false, message: `Failed to create task: ${error.message || 'Unknown error'}` });
+          }),
           map(() => ({ success: true, message: `Task "${data.details.name}" created successfully.` }))
         );
       
       case 'update':
         const taskToUpdate = tasks.find(task => 
-          task.name.toLowerCase() === data.targetTask.toLowerCase()
+          task.title.toLowerCase() === data.targetTask.toLowerCase()
         );
         
         if (!taskToUpdate) {
+          console.log(`Task not found: "${data.targetTask}"`);
           return of({ success: false, message: `Could not find a task named "${data.targetTask}".` });
         }
         
-        const updateData: any = {};
-        if (data.details.name !== null) updateData.name = data.details.name;
-        if (data.details.desc !== null) updateData.desc = data.details.desc;
-        if (data.details.deadline !== null) updateData.deadline = data.details.deadline;
-        if (data.details.category !== null) updateData.category = data.details.category;
-        if (data.details.tags !== null) updateData.tags = data.details.tags;
+        const updateData: Partial<Todo> = {};
+        if (data.details.name !== null && data.details.name !== undefined) updateData.title = data.details.name;
+        if (data.details.completed !== null && data.details.completed !== undefined) updateData.completed = data.details.completed;
+        if (data.details.desc !== null && data.details.desc !== undefined) updateData.description = data.details.desc;
+        if (data.details.deadline !== null && data.details.deadline !== undefined) updateData.deadline = data.details.deadline;
+        if (data.details.category !== null && data.details.category !== undefined) updateData.priority = data.details.category;
         
+        console.log(`Updating task ${taskToUpdate.id}:`, updateData);
         return this.todoService.updateTask(taskToUpdate.id, updateData).pipe(
+          tap(response => console.log('Backend response - Task updated:', response)),
+          catchError(error => {
+            console.error('Backend error - Failed to update task:', error);
+            return of({ success: false, message: `Failed to update task: ${error.message || 'Unknown error'}` });
+          }),
           map(() => ({ success: true, message: `Task "${data.targetTask}" updated successfully.` }))
         );
       
       case 'complete':
         const taskToComplete = tasks.find(task => 
-          task.name.toLowerCase() === data.targetTask.toLowerCase()
+          task.title.toLowerCase() === data.targetTask.toLowerCase()
         );
         
         if (!taskToComplete) {
+          console.log(`Task not found: "${data.targetTask}"`);
           return of({ success: false, message: `Could not find a task named "${data.targetTask}".` });
         }
         
+        console.log(`Marking task as complete ${taskToComplete.id}`);
         return this.todoService.updateTask(taskToComplete.id, { 
-          completed: true,
-          completedDate: new Date().toISOString()
+          completed: true
         }).pipe(
+          tap(response => console.log('Backend response - Task marked complete:', response)),
+          catchError(error => {
+            console.error('Backend error - Failed to mark task as complete:', error);
+            return of({ success: false, message: `Failed to mark task as complete: ${error.message || 'Unknown error'}` });
+          }),
           map(() => ({ success: true, message: `Task "${data.targetTask}" marked as complete.` }))
         );
       
       case 'delete':
         const taskToDelete = tasks.find(task => 
-          task.name.toLowerCase() === data.targetTask.toLowerCase()
+          task.title.toLowerCase() === data.targetTask.toLowerCase()
         );
         
         if (!taskToDelete) {
+          console.log(`Task not found: "${data.targetTask}"`);
           return of({ success: false, message: `Could not find a task named "${data.targetTask}".` });
         }
         
+        console.log(`Deleting task ${taskToDelete.id}`);
         return this.todoService.deleteTask(taskToDelete.id).pipe(
+          tap(response => console.log('Backend response - Task deleted:', response)),
+          catchError(error => {
+            console.error('Backend error - Failed to delete task:', error);
+            return of({ success: false, message: `Failed to delete task: ${error.message || 'Unknown error'}` });
+          }),
           map(() => ({ success: true, message: `Task "${data.targetTask}" deleted successfully.` }))
         );
 
       case 'timeQuery':
-        const { startDate, endDate } = data.timeFrame;
-        const filteredTasks = tasks.filter(task => {
-          const taskDate = new Date(task.deadline);
-          return taskDate >= new Date(startDate) && taskDate <= new Date(endDate);
-        });
-        
+        console.log('Time query requested:', data.timeFrame);
+        // Time queries would need to be handled separately as the backend doesn't support this
         return of({
           success: true,
-          tasks: filteredTasks,
-          message: `Found ${filteredTasks.length} tasks for the specified time period.`
+          isQuery: true,
+          message: `For time-based queries, please use the backend API directly.`
         });
       
       default:
-        return of({ success: false, message: 'Invalid operation.' });
+        console.log('Invalid operation requested:', operation);
+        return of({ success: false, isQuery: true, message: 'Invalid operation.' });
     }
   }
 
